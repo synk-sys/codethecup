@@ -9,38 +9,225 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRevealRouteImport } from './routes/_authenticated/reveal'
+import { Route as AuthenticatedResultsRouteImport } from './routes/_authenticated/results'
+import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
+import { Route as AuthenticatedVoteIndexRouteImport } from './routes/_authenticated/vote.index'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as AuthenticatedVoteProjectIdRouteImport } from './routes/_authenticated/vote.$projectId'
+import { Route as AuthenticatedAdminTeamsRouteImport } from './routes/_authenticated/admin/teams'
+import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
+import { Route as AuthenticatedAdminResultsRouteImport } from './routes/_authenticated/admin/results'
+import { Route as AuthenticatedAdminMonitorRouteImport } from './routes/_authenticated/admin/monitor'
+import { Route as AuthenticatedAdminCriteriaRouteImport } from './routes/_authenticated/admin/criteria'
+import { Route as AuthenticatedAdminChallengesRouteImport } from './routes/_authenticated/admin/challenges'
 
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRevealRoute = AuthenticatedRevealRouteImport.update({
+  id: '/reveal',
+  path: '/reveal',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedResultsRoute = AuthenticatedResultsRouteImport.update({
+  id: '/results',
+  path: '/results',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedVoteIndexRoute = AuthenticatedVoteIndexRouteImport.update({
+  id: '/vote/',
+  path: '/vote/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const AuthenticatedVoteProjectIdRoute =
+  AuthenticatedVoteProjectIdRouteImport.update({
+    id: '/vote/$projectId',
+    path: '/vote/$projectId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminTeamsRoute = AuthenticatedAdminTeamsRouteImport.update({
+  id: '/teams',
+  path: '/teams',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const AuthenticatedAdminSettingsRoute =
+  AuthenticatedAdminSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminResultsRoute =
+  AuthenticatedAdminResultsRouteImport.update({
+    id: '/results',
+    path: '/results',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminMonitorRoute =
+  AuthenticatedAdminMonitorRouteImport.update({
+    id: '/monitor',
+    path: '/monitor',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminCriteriaRoute =
+  AuthenticatedAdminCriteriaRouteImport.update({
+    id: '/criteria',
+    path: '/criteria',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminChallengesRoute =
+  AuthenticatedAdminChallengesRouteImport.update({
+    id: '/challenges',
+    path: '/challenges',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/results': typeof AuthenticatedResultsRoute
+  '/reveal': typeof AuthenticatedRevealRoute
+  '/admin/challenges': typeof AuthenticatedAdminChallengesRoute
+  '/admin/criteria': typeof AuthenticatedAdminCriteriaRoute
+  '/admin/monitor': typeof AuthenticatedAdminMonitorRoute
+  '/admin/results': typeof AuthenticatedAdminResultsRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
+  '/admin/teams': typeof AuthenticatedAdminTeamsRoute
+  '/vote/$projectId': typeof AuthenticatedVoteProjectIdRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/vote/': typeof AuthenticatedVoteIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/results': typeof AuthenticatedResultsRoute
+  '/reveal': typeof AuthenticatedRevealRoute
+  '/admin/challenges': typeof AuthenticatedAdminChallengesRoute
+  '/admin/criteria': typeof AuthenticatedAdminCriteriaRoute
+  '/admin/monitor': typeof AuthenticatedAdminMonitorRoute
+  '/admin/results': typeof AuthenticatedAdminResultsRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
+  '/admin/teams': typeof AuthenticatedAdminTeamsRoute
+  '/vote/$projectId': typeof AuthenticatedVoteProjectIdRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
+  '/vote': typeof AuthenticatedVoteIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/_authenticated/results': typeof AuthenticatedResultsRoute
+  '/_authenticated/reveal': typeof AuthenticatedRevealRoute
+  '/_authenticated/admin/challenges': typeof AuthenticatedAdminChallengesRoute
+  '/_authenticated/admin/criteria': typeof AuthenticatedAdminCriteriaRoute
+  '/_authenticated/admin/monitor': typeof AuthenticatedAdminMonitorRoute
+  '/_authenticated/admin/results': typeof AuthenticatedAdminResultsRoute
+  '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
+  '/_authenticated/admin/teams': typeof AuthenticatedAdminTeamsRoute
+  '/_authenticated/vote/$projectId': typeof AuthenticatedVoteProjectIdRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/vote/': typeof AuthenticatedVoteIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/admin'
+    | '/results'
+    | '/reveal'
+    | '/admin/challenges'
+    | '/admin/criteria'
+    | '/admin/monitor'
+    | '/admin/results'
+    | '/admin/settings'
+    | '/admin/teams'
+    | '/vote/$projectId'
+    | '/admin/'
+    | '/vote/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/results'
+    | '/reveal'
+    | '/admin/challenges'
+    | '/admin/criteria'
+    | '/admin/monitor'
+    | '/admin/results'
+    | '/admin/settings'
+    | '/admin/teams'
+    | '/vote/$projectId'
+    | '/admin'
+    | '/vote'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/admin'
+    | '/_authenticated/results'
+    | '/_authenticated/reveal'
+    | '/_authenticated/admin/challenges'
+    | '/_authenticated/admin/criteria'
+    | '/_authenticated/admin/monitor'
+    | '/_authenticated/admin/results'
+    | '/_authenticated/admin/settings'
+    | '/_authenticated/admin/teams'
+    | '/_authenticated/vote/$projectId'
+    | '/_authenticated/admin/'
+    | '/_authenticated/vote/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +235,143 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/reveal': {
+      id: '/_authenticated/reveal'
+      path: '/reveal'
+      fullPath: '/reveal'
+      preLoaderRoute: typeof AuthenticatedRevealRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/results': {
+      id: '/_authenticated/results'
+      path: '/results'
+      fullPath: '/results'
+      preLoaderRoute: typeof AuthenticatedResultsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/vote/': {
+      id: '/_authenticated/vote/'
+      path: '/vote'
+      fullPath: '/vote/'
+      preLoaderRoute: typeof AuthenticatedVoteIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/vote/$projectId': {
+      id: '/_authenticated/vote/$projectId'
+      path: '/vote/$projectId'
+      fullPath: '/vote/$projectId'
+      preLoaderRoute: typeof AuthenticatedVoteProjectIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/teams': {
+      id: '/_authenticated/admin/teams'
+      path: '/teams'
+      fullPath: '/admin/teams'
+      preLoaderRoute: typeof AuthenticatedAdminTeamsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/settings': {
+      id: '/_authenticated/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/results': {
+      id: '/_authenticated/admin/results'
+      path: '/results'
+      fullPath: '/admin/results'
+      preLoaderRoute: typeof AuthenticatedAdminResultsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/monitor': {
+      id: '/_authenticated/admin/monitor'
+      path: '/monitor'
+      fullPath: '/admin/monitor'
+      preLoaderRoute: typeof AuthenticatedAdminMonitorRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/criteria': {
+      id: '/_authenticated/admin/criteria'
+      path: '/criteria'
+      fullPath: '/admin/criteria'
+      preLoaderRoute: typeof AuthenticatedAdminCriteriaRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/challenges': {
+      id: '/_authenticated/admin/challenges'
+      path: '/challenges'
+      fullPath: '/admin/challenges'
+      preLoaderRoute: typeof AuthenticatedAdminChallengesRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
   }
 }
 
+interface AuthenticatedAdminRouteRouteChildren {
+  AuthenticatedAdminChallengesRoute: typeof AuthenticatedAdminChallengesRoute
+  AuthenticatedAdminCriteriaRoute: typeof AuthenticatedAdminCriteriaRoute
+  AuthenticatedAdminMonitorRoute: typeof AuthenticatedAdminMonitorRoute
+  AuthenticatedAdminResultsRoute: typeof AuthenticatedAdminResultsRoute
+  AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
+  AuthenticatedAdminTeamsRoute: typeof AuthenticatedAdminTeamsRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+}
+
+const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
+  {
+    AuthenticatedAdminChallengesRoute: AuthenticatedAdminChallengesRoute,
+    AuthenticatedAdminCriteriaRoute: AuthenticatedAdminCriteriaRoute,
+    AuthenticatedAdminMonitorRoute: AuthenticatedAdminMonitorRoute,
+    AuthenticatedAdminResultsRoute: AuthenticatedAdminResultsRoute,
+    AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
+    AuthenticatedAdminTeamsRoute: AuthenticatedAdminTeamsRoute,
+    AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  }
+
+const AuthenticatedAdminRouteRouteWithChildren =
+  AuthenticatedAdminRouteRoute._addFileChildren(
+    AuthenticatedAdminRouteRouteChildren,
+  )
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
+  AuthenticatedResultsRoute: typeof AuthenticatedResultsRoute
+  AuthenticatedRevealRoute: typeof AuthenticatedRevealRoute
+  AuthenticatedVoteProjectIdRoute: typeof AuthenticatedVoteProjectIdRoute
+  AuthenticatedVoteIndexRoute: typeof AuthenticatedVoteIndexRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
+  AuthenticatedResultsRoute: AuthenticatedResultsRoute,
+  AuthenticatedRevealRoute: AuthenticatedRevealRoute,
+  AuthenticatedVoteProjectIdRoute: AuthenticatedVoteProjectIdRoute,
+  AuthenticatedVoteIndexRoute: AuthenticatedVoteIndexRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
