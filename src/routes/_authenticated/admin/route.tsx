@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, redirect, Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
-import { LayoutDashboard, Settings, Users, Award, ListChecks, Activity, Trophy } from "lucide-react";
+import { LayoutDashboard, Settings, Users, Award, ListChecks, Activity, Trophy, ShieldCheck } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   ssr: false,
@@ -21,6 +21,7 @@ const NAV: { to: string; label: string; icon: any; exact?: boolean }[] = [
   { to: "/admin/teams", label: "Teams & Projects", icon: Users },
   { to: "/admin/monitor", label: "Monitor", icon: Activity },
   { to: "/admin/results", label: "Results", icon: Trophy },
+  { to: "/admin/roles", label: "Admins", icon: ShieldCheck },
 ];
 
 function AdminLayout() {
