@@ -196,6 +196,3 @@ function EmptyState({ title, body }: { title: string; body: string }) {
   );
 }
 
-// Keep unused import happy for shared types
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const _unused = useMemo;
