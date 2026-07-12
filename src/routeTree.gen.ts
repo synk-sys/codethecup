@@ -17,6 +17,7 @@ import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authentic
 import { Route as AuthenticatedVoteIndexRouteImport } from './routes/_authenticated/vote.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedVoteProjectIdRouteImport } from './routes/_authenticated/vote.$projectId'
+import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -58,12 +59,19 @@ const AuthenticatedVoteProjectIdRoute =
     path: '/vote/$projectId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminSettingsRoute =
+  AuthenticatedAdminSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/results': typeof AuthenticatedResultsRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/vote/$projectId': typeof AuthenticatedVoteProjectIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/vote/': typeof AuthenticatedVoteIndexRoute
@@ -72,6 +80,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/results': typeof AuthenticatedResultsRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/vote/$projectId': typeof AuthenticatedVoteProjectIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/vote': typeof AuthenticatedVoteIndexRoute
@@ -83,6 +92,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/results': typeof AuthenticatedResultsRoute
+  '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/vote/$projectId': typeof AuthenticatedVoteProjectIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/vote/': typeof AuthenticatedVoteIndexRoute
@@ -94,11 +104,19 @@ export interface FileRouteTypes {
     | '/auth'
     | '/admin'
     | '/results'
+    | '/admin/settings'
     | '/vote/$projectId'
     | '/admin/'
     | '/vote/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/results' | '/vote/$projectId' | '/admin' | '/vote'
+  to:
+    | '/'
+    | '/auth'
+    | '/results'
+    | '/admin/settings'
+    | '/vote/$projectId'
+    | '/admin'
+    | '/vote'
   id:
     | '__root__'
     | '/'
@@ -106,6 +124,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/admin'
     | '/_authenticated/results'
+    | '/_authenticated/admin/settings'
     | '/_authenticated/vote/$projectId'
     | '/_authenticated/admin/'
     | '/_authenticated/vote/'
@@ -175,15 +194,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedVoteProjectIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/settings': {
+      id: '/_authenticated/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
   }
 }
 
 interface AuthenticatedAdminRouteRouteChildren {
+  AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
   {
+    AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
     AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   }
 
