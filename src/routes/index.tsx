@@ -133,7 +133,7 @@ function Landing() {
               <span key={c} className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: c }} />
             ))}
           </div>
-          <h1 className="mt-6 text-6xl sm:text-7xl md:text-8xl font-black leading-[0.9] tracking-tight">
+          <h1 className="mt-6 text-6xl sm:text-7xl md:text-8xl font-black leading-[1.1] tracking-tight">
             Code the Cup,<br />
             <span className="gradient-text">judged by the fans.</span>
           </h1>
