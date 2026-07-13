@@ -3,7 +3,9 @@ import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useSession, isAdmin } from "@/lib/use-session";
-import { Trophy, Sparkles, Users, Zap } from "lucide-react";
+import { Trophy, Sparkles, Users, Zap, Shield } from "lucide-react";
+
+const GOOGLE_COLORS = ["#4285F4", "#EA4335", "#FBBC05", "#34A853"];
 
 export const Route = createFileRoute("/")({
   component: Landing,
@@ -40,6 +42,11 @@ function Landing() {
           }}
         />
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative max-w-4xl mx-auto text-center">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            {GOOGLE_COLORS.map((c) => (
+              <span key={c} className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: c }} />
+            ))}
+          </div>
           <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold text-primary border border-primary/20">
             <Sparkles className="h-3 w-3" /> ⚽ World Cup hack night
           </span>
@@ -55,14 +62,18 @@ function Landing() {
           </div>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mt-24 grid gap-6 md:grid-cols-3 max-w-5xl mx-auto">
+        <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mt-24 grid gap-6 sm:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto">
           {[
             { icon: Users, title: "Everyone votes", body: "No separate judges. Every participant scores every eligible project — never their own." },
+            { icon: Shield, title: "Fair & anonymous", body: "Ballots are anonymous by design, so scores reflect the project, not the popularity." },
             { icon: Zap, title: "Weighted rubrics", body: "Configure criteria, weights, and score scales. Live weighted preview as you rate." },
             { icon: Trophy, title: "Big reveal", body: "Fullscreen Kahoot-style reveal: countdown → 2nd → 1st → confetti podium." },
-          ].map(({ icon: Icon, title, body }) => (
+          ].map(({ icon: Icon, title, body }, i) => (
             <div key={title} className="glass rounded-2xl p-6">
-              <div className="grid h-11 w-11 place-items-center rounded-xl bg-primary/15 text-primary mb-4">
+              <div
+                className="grid h-11 w-11 place-items-center rounded-xl mb-4"
+                style={{ backgroundColor: `color-mix(in oklab, ${GOOGLE_COLORS[i]} 15%, transparent)`, color: GOOGLE_COLORS[i] }}
+              >
                 <Icon className="h-5 w-5" />
               </div>
               <h3 className="text-xl font-bold">{title}</h3>

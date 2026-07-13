@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Users, ClipboardCheck, Target, Award, Play, ArrowRight } from "lucide-react";
 
+const GOOGLE_COLORS = ["#4285F4", "#EA4335", "#FBBC05", "#34A853"];
+
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminDash,
 });
@@ -56,10 +58,10 @@ function AdminDash() {
         <p className="text-muted-foreground">{event.description}</p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Stat icon={Users} label="Teams" value={teamsCount} />
-        <Stat icon={Target} label="Projects" value={projectsCount} />
-        <Stat icon={ClipboardCheck} label="Votes submitted" value={submitted} sub={`${drafts} drafts`} />
-        <Stat icon={Award} label="Challenges" value={challengesCount} />
+        <Stat icon={Users} label="Teams" value={teamsCount} color={GOOGLE_COLORS[0]} />
+        <Stat icon={Target} label="Projects" value={projectsCount} color={GOOGLE_COLORS[1]} />
+        <Stat icon={ClipboardCheck} label="Votes submitted" value={submitted} sub={`${drafts} drafts`} color={GOOGLE_COLORS[2]} />
+        <Stat icon={Award} label="Challenges" value={challengesCount} color={GOOGLE_COLORS[3]} />
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <QuickLink to="/admin/teams" title="Add teams & projects" body="Roster your teams and their submissions." />
@@ -71,10 +73,10 @@ function AdminDash() {
   );
 }
 
-function Stat({ icon: Icon, label, value, sub }: any) {
+function Stat({ icon: Icon, label, value, sub, color }: any) {
   return (
     <Card className="p-5 glass">
-      <Icon className="h-5 w-5 text-primary mb-2" />
+      <Icon className="h-5 w-5 mb-2" style={{ color }} />
       <div className="text-3xl font-black tabular-nums">{value}</div>
       <div className="text-xs text-muted-foreground">{label}{sub && ` • ${sub}`}</div>
     </Card>
