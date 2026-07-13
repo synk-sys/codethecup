@@ -138,7 +138,12 @@ function VoteDashboard() {
                   <Card className="p-5 h-full flex flex-col hover:border-primary/60 transition glass hover:shadow-[var(--shadow-glow)]">
                     <div className="flex items-start justify-between gap-3 mb-3">
                       <StatusBadge status={status} />
-                      {ch && <Badge variant="outline" className="text-[10px]">{ch.name}</Badge>}
+                      {ch && (
+                        <Badge variant="outline" className="text-[10px] gap-1.5">
+                          <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: ch.color ?? undefined }} />
+                          {ch.name}
+                        </Badge>
+                      )}
                     </div>
                     <h3 className="text-lg font-bold leading-tight line-clamp-2">{p.title}</h3>
                     <p className="text-sm text-muted-foreground mt-1">{team?.name}</p>

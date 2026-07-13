@@ -124,18 +124,28 @@ function AuthPage() {
               </TabsList>
 
               <TabsContent value="participant" className="mt-6 space-y-4">
-                <form onSubmit={sendMagicLink} className="space-y-4">
+                <form onSubmit={passwordAuth} className="space-y-4">
+                  {isSignUp && (
+                    <div className="space-y-2">
+                      <Label htmlFor="name-p">Display name</Label>
+                      <Input id="name-p" value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="Your name" />
+                    </div>
+                  )}
                   <div className="space-y-2">
                     <Label htmlFor="email-p">Email</Label>
                     <Input id="email-p" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@team.com" />
                   </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="password-p">Password</Label>
+                    <Input id="password-p" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
+                  </div>
                   <Button type="submit" disabled={loading} className="w-full h-11 font-semibold">
-                    {loading ? "Sending..." : "Send magic link"}
+                    {loading ? "..." : isSignUp ? "Create account" : "Sign in"}
                   </Button>
                 </form>
-                <p className="text-xs text-muted-foreground text-center">
-                  Use the email your team lead added to the roster.
-                </p>
+                <button type="button" onClick={() => setIsSignUp((v) => !v)} className="text-xs text-muted-foreground hover:text-foreground w-full text-center">
+                  {isSignUp ? "Already have an account? Sign in" : "First time? Create an account"}
+                </button>
               </TabsContent>
 
               <TabsContent value="admin" className="mt-6 space-y-4">

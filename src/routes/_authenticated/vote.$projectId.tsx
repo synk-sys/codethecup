@@ -139,7 +139,12 @@ function VotePage() {
       <Card className="p-6 glass mb-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0 flex-1">
-            {challenge && <Badge variant="outline" className="mb-2">{challenge.name}</Badge>}
+            {challenge && (
+              <Badge variant="outline" className="mb-2 gap-1.5">
+                <span className="h-2 w-2 rounded-full" style={{ backgroundColor: challenge.color ?? undefined }} />
+                {challenge.name}
+              </Badge>
+            )}
             <h1 className="text-3xl font-black leading-tight">{project.title}</h1>
             <p className="text-muted-foreground mt-1">{team?.name}</p>
             {project.description && <p className="mt-4 text-sm leading-relaxed">{project.description}</p>}
