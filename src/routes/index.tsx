@@ -97,7 +97,9 @@ function StadiumTransition({ onDone }: { onDone: () => void }) {
     return () => clearTimeout(t);
   }, [onDone]);
 
-  const ballDuration = TRANSITION_MS / 1000 - 0.18;
+  const flightDuration = 0.55;
+  const kickDelay = 0.16;
+  const netHitAt = kickDelay + flightDuration;
 
   return (
     <motion.div
@@ -109,17 +111,43 @@ function StadiumTransition({ onDone }: { onDone: () => void }) {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.25 }}
       className="fixed inset-0 z-50 flex items-center justify-center cursor-pointer overflow-hidden"
-      style={{ background: "radial-gradient(circle at 50% 45%, #131a26 0%, #05070b 70%)" }}
+      style={{
+        backgroundColor: "#1a4fd6",
+        backgroundImage:
+          "repeating-linear-gradient(45deg, rgba(255,255,255,0.07) 0 2px, transparent 2px 22px)," +
+          "repeating-linear-gradient(-45deg, rgba(255,255,255,0.07) 0 2px, transparent 2px 22px)",
+      }}
     >
       <motion.p
-        className="absolute top-[18%] text-white font-black tracking-tight text-center px-6"
+        className="absolute top-[12%] text-white font-black tracking-tight text-center px-6"
         style={{ fontSize: "clamp(24px, 5vw, 44px)" }}
         initial={{ opacity: 0, scale: 0.85 }}
         animate={{ opacity: [0, 1, 1, 0], scale: [0.85, 1.05, 1, 1] }}
-        transition={{ duration: ballDuration * 0.55, times: [0, 0.3, 0.75, 1] }}
+        transition={{ duration: netHitAt, times: [0, 0.3, 0.75, 1] }}
       >
         ENTERING THE STADIUM
       </motion.p>
+
+      {/* goal net, top-center — a simple diamond mesh in a rounded trapezoid */}
+      <motion.div
+        className="absolute"
+        style={{
+          top: "26%",
+          left: "50%",
+          width: "min(60vw, 340px)",
+          height: "min(30vh, 200px)",
+          marginLeft: "min(-30vw, -170px)",
+          clipPath: "polygon(8% 0%, 92% 0%, 100% 100%, 0% 100%)",
+          backgroundColor: "rgba(255,255,255,0.06)",
+          backgroundImage:
+            "repeating-linear-gradient(35deg, rgba(255,255,255,0.85) 0 1.5px, transparent 1.5px 20px)," +
+            "repeating-linear-gradient(-35deg, rgba(255,255,255,0.85) 0 1.5px, transparent 1.5px 20px)",
+          transformOrigin: "50% 0%",
+        }}
+        initial={{ scaleY: 1, scaleX: 1 }}
+        animate={{ scaleY: [1, 1, 1.12, 1], scaleX: [1, 1, 1.05, 1] }}
+        transition={{ duration: TRANSITION_MS / 1000, times: [0, netHitAt / (TRANSITION_MS / 1000), Math.min(netHitAt / (TRANSITION_MS / 1000) + 0.08, 0.97), 1] }}
+      />
 
       {/* player silhouette, planted at the bottom-left, swings a leg into the ball */}
       <motion.div
@@ -130,42 +158,34 @@ function StadiumTransition({ onDone }: { onDone: () => void }) {
         transition={{ duration: 0.75, times: [0, 0.15, 0.75, 1], delay: 0.05 }}
       >
         {/* head */}
-        <div className="absolute rounded-full bg-white/85" style={{ width: 16, height: 16, left: 15, top: 0 }} />
+        <div className="absolute rounded-full bg-white/90" style={{ width: 16, height: 16, left: 15, top: 0 }} />
         {/* torso */}
-        <div className="absolute rounded-full bg-white/85" style={{ width: 14, height: 34, left: 16, top: 15 }} />
+        <div className="absolute rounded-full bg-white/90" style={{ width: 14, height: 34, left: 16, top: 15 }} />
         {/* standing leg */}
-        <div className="absolute rounded-full bg-white/85" style={{ width: 9, height: 38, left: 13, top: 46 }} />
+        <div className="absolute rounded-full bg-white/90" style={{ width: 9, height: 38, left: 13, top: 46 }} />
         {/* kicking leg — swings forward to meet the ball */}
         <motion.div
-          className="absolute rounded-full bg-white/85 origin-top"
+          className="absolute rounded-full bg-white/90 origin-top"
           style={{ width: 9, height: 38, left: 24, top: 46 }}
           initial={{ rotate: 25 }}
           animate={{ rotate: -85 }}
-          transition={{ duration: 0.22, delay: 0.16, ease: "easeIn" }}
+          transition={{ duration: 0.22, delay: kickDelay, ease: "easeIn" }}
         />
       </motion.div>
 
-      {/* single ball, kicked from lower-left, growing as it rushes the camera */}
+      {/* ball, kicked from lower-left, flies up into the net and stops caught */}
       <motion.div
         className="absolute select-none"
-        style={{ fontSize: 44, lineHeight: 1 }}
-        initial={{ x: "-30vw", y: "24vh", scale: 0.6, rotate: 0, opacity: 0 }}
-        animate={{ x: "0vw", y: "0vh", scale: 20, rotate: 520, opacity: 1 }}
+        style={{ fontSize: 34, lineHeight: 1 }}
+        initial={{ x: "-28vw", y: "22vh", scale: 0.7, rotate: 0, opacity: 0 }}
+        animate={{ x: "0vw", y: "-30vh", scale: 1.6, rotate: 380, opacity: 1 }}
         transition={{
-          opacity: { duration: 0.05, delay: 0.16 },
-          default: { duration: ballDuration, delay: 0.16, ease: [0.36, 0, 0.66, -0.1] },
+          opacity: { duration: 0.05, delay: kickDelay },
+          default: { duration: flightDuration, delay: kickDelay, ease: [0.22, 0.7, 0.35, 1] },
         }}
       >
         ⚽
       </motion.div>
-
-      {/* impact flash as the ball fills the screen, revealing sign-in underneath */}
-      <motion.div
-        className="absolute inset-0 bg-white"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: [0, 0, 1] }}
-        transition={{ duration: TRANSITION_MS / 1000, times: [0, 0.86, 1] }}
-      />
 
       <span className="absolute bottom-6 text-xs text-white/50">Tap to skip</span>
     </motion.div>
