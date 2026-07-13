@@ -78,7 +78,7 @@ function AuthPage() {
 
   return (
     <div className="min-h-screen grid lg:grid-cols-2">
-      <div className="hidden lg:flex flex-col items-start justify-center gap-8 p-12 relative overflow-hidden">
+      <div className="hidden lg:flex flex-col items-center justify-center text-center gap-8 p-12 relative overflow-hidden">
         <div className="absolute inset-0" style={{ background: "var(--gradient-stage)" }} />
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="relative z-10">
           <div className="flex items-center gap-2 text-2xl font-black">
@@ -92,8 +92,8 @@ function AuthPage() {
           <h1 className="text-6xl font-black leading-[0.95]">
             World Cup<br /> hackathons,<br /><span className="gradient-text">gamified.</span>
           </h1>
-          <p className="text-xs text-muted-foreground">⚽ Built for fans</p>
         </motion.div>
+        <div className="relative z-10 text-xs text-muted-foreground">⚽ Built for fans</div>
       </div>
 
       <div className="flex items-center justify-center p-6 lg:p-12">
