@@ -128,25 +128,30 @@ function StadiumTransition({ onDone }: { onDone: () => void }) {
         ENTERING THE STADIUM
       </motion.p>
 
-      {/* goal net, top-center — a simple diamond mesh in a rounded trapezoid */}
+      {/* goal net — starts small near top-center, then rushes toward camera with the ball */}
       <motion.div
         className="absolute"
         style={{
-          top: "26%",
+          top: "50%",
           left: "50%",
           width: "min(60vw, 340px)",
           height: "min(30vh, 200px)",
           marginLeft: "min(-30vw, -170px)",
+          marginTop: "min(-15vh, -100px)",
           clipPath: "polygon(8% 0%, 92% 0%, 100% 100%, 0% 100%)",
           backgroundColor: "rgba(255,255,255,0.06)",
           backgroundImage:
             "repeating-linear-gradient(35deg, rgba(255,255,255,0.85) 0 1.5px, transparent 1.5px 20px)," +
             "repeating-linear-gradient(-35deg, rgba(255,255,255,0.85) 0 1.5px, transparent 1.5px 20px)",
-          transformOrigin: "50% 0%",
         }}
-        initial={{ scaleY: 1, scaleX: 1 }}
-        animate={{ scaleY: [1, 1, 1.12, 1], scaleX: [1, 1, 1.05, 1] }}
-        transition={{ duration: TRANSITION_MS / 1000, times: [0, netHitAt / (TRANSITION_MS / 1000), Math.min(netHitAt / (TRANSITION_MS / 1000) + 0.08, 0.97), 1] }}
+        initial={{ scale: 0.35, y: "-24vh", opacity: 0.5 }}
+        animate={{ scale: [0.35, 8, 9], y: ["-24vh", "0vh", "0vh"], opacity: [0.5, 1, 1] }}
+        transition={{
+          duration: flightDuration + 0.12,
+          delay: kickDelay,
+          times: [0, 0.92, 1],
+          ease: [0.22, 0.7, 0.35, 1],
+        }}
       />
 
       {/* player silhouette, planted at the bottom-left, swings a leg into the ball */}
@@ -173,15 +178,20 @@ function StadiumTransition({ onDone }: { onDone: () => void }) {
         />
       </motion.div>
 
-      {/* ball, kicked from lower-left, flies up into the net and stops caught */}
+      {/* ball, kicked from lower-left, grows huge as it rushes into the net */}
       <motion.div
         className="absolute select-none"
         style={{ fontSize: 34, lineHeight: 1 }}
         initial={{ x: "-28vw", y: "22vh", scale: 0.7, rotate: 0, opacity: 0 }}
-        animate={{ x: "0vw", y: "-30vh", scale: 1.6, rotate: 380, opacity: 1 }}
+        animate={{ x: "0vw", y: "0vh", scale: [0.7, 16, 18], rotate: 460, opacity: 1 }}
         transition={{
           opacity: { duration: 0.05, delay: kickDelay },
-          default: { duration: flightDuration, delay: kickDelay, ease: [0.22, 0.7, 0.35, 1] },
+          default: {
+            duration: flightDuration + 0.12,
+            delay: kickDelay,
+            times: [0, 0.92, 1],
+            ease: [0.22, 0.7, 0.35, 1],
+          },
         }}
       >
         ⚽
