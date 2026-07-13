@@ -41,7 +41,7 @@ function Landing() {
         />
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative max-w-4xl mx-auto text-center">
           <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold text-primary border border-primary/20">
-            <Sparkles className="h-3 w-3" /> ⚽ World Cup hack night — peer-judged, anonymous, fair
+            <Sparkles className="h-3 w-3" /> ⚽ World Cup hack night
           </span>
           <h1 className="mt-6 text-6xl sm:text-7xl md:text-8xl font-black leading-[0.9] tracking-tight">
             Code the Cup,<br />
