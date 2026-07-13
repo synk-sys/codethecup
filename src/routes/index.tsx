@@ -138,6 +138,7 @@ function StadiumTransition({ onDone }: { onDone: () => void }) {
           height: "min(30vh, 200px)",
           marginLeft: "min(-30vw, -170px)",
           marginTop: "min(-15vh, -100px)",
+          zIndex: 2,
           clipPath: "polygon(8% 0%, 92% 0%, 100% 100%, 0% 100%)",
           backgroundColor: "rgba(255,255,255,0.06)",
           backgroundImage:
