@@ -12,35 +12,74 @@ function playWhistle() {
   try {
     const Ctx = window.AudioContext || (window as any).webkitAudioContext;
     const ctx = new Ctx();
-    const DUR = 1.0;
+    const t0 = ctx.currentTime;
+    const DUR = 0.9;
 
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = "sine";
-    osc.frequency.setValueAtTime(2200, ctx.currentTime);
-    osc.frequency.linearRampToValueAtTime(2600, ctx.currentTime + 0.12);
-    osc.frequency.linearRampToValueAtTime(2500, ctx.currentTime + DUR - 0.1);
+    const master = ctx.createGain();
+    master.gain.setValueAtTime(0, t0);
+    master.gain.linearRampToValueAtTime(0.22, t0 + 0.012);
+    master.gain.setValueAtTime(0.22, t0 + DUR - 0.09);
+    master.gain.linearRampToValueAtTime(0, t0 + DUR);
+    master.connect(ctx.destination);
 
-    // classic "pea" trill: a fast LFO wobbling the pitch
+    // two close, slightly detuned tones beat against each other — the
+    // metallic "shimmer" a rolling pea makes inside a real whistle
+    const tone = ctx.createGain();
+    tone.connect(master);
+    [2900, 2940].forEach((freq) => {
+      const osc = ctx.createOscillator();
+      osc.type = "square";
+      osc.frequency.setValueAtTime(freq, t0);
+      const oscGain = ctx.createGain();
+      oscGain.gain.value = 0.5;
+      osc.connect(oscGain);
+      oscGain.connect(tone);
+      osc.start(t0);
+      osc.stop(t0 + DUR + 0.02);
+    });
+
+    // fast tremolo — the pea trill
+    const tremolo = ctx.createGain();
+    tremolo.gain.value = 0.75;
+    tone.disconnect();
+    tone.connect(tremolo);
+    tremolo.connect(master);
     const lfo = ctx.createOscillator();
-    const lfoGain = ctx.createGain();
-    lfo.frequency.setValueAtTime(28, ctx.currentTime);
-    lfoGain.gain.setValueAtTime(60, ctx.currentTime);
-    lfo.connect(lfoGain);
-    lfoGain.connect(osc.frequency);
+    const lfoDepth = ctx.createGain();
+    lfo.frequency.setValueAtTime(24, t0);
+    lfoDepth.gain.setValueAtTime(0.25, t0);
+    lfo.connect(lfoDepth);
+    lfoDepth.connect(tremolo.gain);
+    lfo.start(t0);
+    lfo.stop(t0 + DUR + 0.02);
 
-    gain.gain.setValueAtTime(0, ctx.currentTime);
-    gain.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 0.03);
-    gain.gain.setValueAtTime(0.15, ctx.currentTime + DUR - 0.12);
-    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + DUR);
+    // bandpass to tame the square wave's harsh harmonics into a whistle-like tone
+    const filter = ctx.createBiquadFilter();
+    filter.type = "bandpass";
+    filter.frequency.value = 2900;
+    filter.Q.value = 3;
+    master.disconnect();
+    master.connect(filter);
+    filter.connect(ctx.destination);
 
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start();
-    lfo.start();
-    osc.stop(ctx.currentTime + DUR + 0.02);
-    lfo.stop(ctx.currentTime + DUR + 0.02);
-    osc.onended = () => ctx.close();
+    // breathy noise burst at the attack
+    const noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 0.06, ctx.sampleRate);
+    const data = noiseBuf.getChannelData(0);
+    for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+    const noise = ctx.createBufferSource();
+    noise.buffer = noiseBuf;
+    const noiseFilter = ctx.createBiquadFilter();
+    noiseFilter.type = "bandpass";
+    noiseFilter.frequency.value = 3000;
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.setValueAtTime(0.2, t0);
+    noiseGain.gain.linearRampToValueAtTime(0, t0 + 0.06);
+    noise.connect(noiseFilter);
+    noiseFilter.connect(noiseGain);
+    noiseGain.connect(ctx.destination);
+    noise.start(t0);
+
+    setTimeout(() => ctx.close(), (DUR + 0.1) * 1000);
   } catch {
     // audio not available — silently skip
   }
