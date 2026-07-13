@@ -19,12 +19,16 @@ export const Route = createFileRoute("/auth")({
       { name: "description", content: "Sign in to vote on hackathon projects." },
     ],
   }),
+  validateSearch: (search: Record<string, unknown>): { mode?: "participant" | "admin" } => ({
+    mode: search.mode === "admin" ? "admin" : search.mode === "participant" ? "participant" : undefined,
+  }),
   component: AuthPage,
 });
 
 function AuthPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"participant" | "admin">("participant");
+  const { mode: lockedMode } = Route.useSearch();
+  const [mode, setMode] = useState<"participant" | "admin">(lockedMode ?? "participant");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
@@ -117,14 +121,18 @@ function AuthPage() {
           <Card className="p-8 glass">
             <div className="mb-6">
               <h2 className="text-2xl font-bold">Sign in to Code the Cup</h2>
-              <p className="text-sm text-muted-foreground mt-1">Choose how you're joining the event.</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                {lockedMode ? "Sign in to vote on projects." : "Choose how you're joining the event."}
+              </p>
             </div>
 
             <Tabs value={mode} onValueChange={(v) => setMode(v as "participant" | "admin")}>
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="participant">Participant</TabsTrigger>
-                <TabsTrigger value="admin">Admin</TabsTrigger>
-              </TabsList>
+              {!lockedMode && (
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="participant">Participant</TabsTrigger>
+                  <TabsTrigger value="admin">Admin</TabsTrigger>
+                </TabsList>
+              )}
 
               <TabsContent value="participant" className="mt-6 space-y-4">
                 <form onSubmit={passwordAuth} className="space-y-4">

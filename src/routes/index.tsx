@@ -55,7 +55,7 @@ function Landing() {
             ⚽ World Cup hack night
           </span>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
-            <Link to="/auth"><Button size="lg" className="h-12 px-8 text-base font-semibold shadow-[0_10px_40px_-10px_#4285F499]">Enter the stadium</Button></Link>
+            <Link to="/auth" search={{ mode: "participant" }}><Button size="lg" className="h-12 px-8 text-base font-semibold shadow-[0_10px_40px_-10px_#4285F499]">Enter the stadium</Button></Link>
           </div>
         </motion.div>
 
