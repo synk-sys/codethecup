@@ -8,9 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Sparkles, Trophy, Zap, Shield } from "lucide-react";
-
-const GOOGLE_COLORS = ["#4285F4", "#EA4335", "#FBBC05", "#34A853"];
+import { Trophy } from "lucide-react";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -94,22 +92,6 @@ function AuthPage() {
           <h1 className="text-6xl font-black leading-[0.95]">
             World Cup<br /> hackathons,<br /><span className="gradient-text">gamified.</span>
           </h1>
-          <p className="text-lg text-muted-foreground max-w-md">
-            Fair weighted scoring, anonymous ballots, and a Kahoot-style winner reveal that makes every finale unforgettable.
-          </p>
-          <div className="grid grid-cols-2 gap-3 max-w-md">
-            {[
-              { icon: Sparkles, label: "Weighted scoring" },
-              { icon: Shield, label: "Fair & anonymous" },
-              { icon: Zap, label: "Live progress" },
-              { icon: Trophy, label: "Big reveal" },
-            ].map(({ icon: Icon, label }, i) => (
-              <div key={label} className="glass rounded-xl p-3 text-sm">
-                <Icon className="h-4 w-4 mb-1" style={{ color: GOOGLE_COLORS[i] }} />
-                <div className="font-semibold">{label}</div>
-              </div>
-            ))}
-          </div>
         </motion.div>
         <div className="relative z-10 text-xs text-muted-foreground">
           ⚽ Built for fans • Anonymous & fair
