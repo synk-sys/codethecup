@@ -13,7 +13,7 @@ import { Sparkles, Trophy, Zap } from "lucide-react";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in — HackVote" },
+      { title: "Sign in — Code the Cup" },
       { name: "description", content: "Sign in to vote on hackathon projects." },
     ],
   }),
@@ -81,12 +81,12 @@ function AuthPage() {
             <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary text-primary-foreground">
               <Trophy className="h-5 w-5" />
             </div>
-            <span className="gradient-text">HackVote</span>
+            <span className="gradient-text">Code the Cup</span>
           </div>
         </motion.div>
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="relative z-10 space-y-6">
           <h1 className="text-6xl font-black leading-[0.95]">
-            Peer-judged<br /> hackathons,<br /><span className="gradient-text">gamified.</span>
+            World Cup<br /> hackathons,<br /><span className="gradient-text">gamified.</span>
           </h1>
           <p className="text-lg text-muted-foreground max-w-md">
             Fair weighted scoring, anonymous ballots, and a Kahoot-style winner reveal that makes every finale unforgettable.
@@ -105,7 +105,7 @@ function AuthPage() {
           </div>
         </motion.div>
         <div className="relative z-10 text-xs text-muted-foreground">
-          Built for hackers • Anonymous & fair
+          ⚽ Built for fans • Anonymous & fair
         </div>
       </div>
 
@@ -113,7 +113,7 @@ function AuthPage() {
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
           <Card className="p-8 glass">
             <div className="mb-6">
-              <h2 className="text-2xl font-bold">Sign in to HackVote</h2>
+              <h2 className="text-2xl font-bold">Sign in to Code the Cup</h2>
               <p className="text-sm text-muted-foreground mt-1">Choose how you're joining the event.</p>
             </div>
 
@@ -174,7 +174,7 @@ function AuthPage() {
               </TabsContent>
             </Tabs>
           </Card>
-          <Link to="/" className="mt-4 block text-center text-xs text-muted-foreground hover:text-foreground">← Back to HackVote</Link>
+          <Link to="/" className="mt-4 block text-center text-xs text-muted-foreground hover:text-foreground">← Back to Code the Cup</Link>
         </motion.div>
       </div>
     </div>

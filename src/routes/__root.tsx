@@ -26,7 +26,7 @@ function NotFoundComponent() {
           to="/"
           className="mt-6 inline-flex items-center justify-center rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition hover:opacity-90"
         >
-          Back to HackVote
+          Back to Code the Cup
         </Link>
       </div>
     </div>
@@ -58,13 +58,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "HackVote — Peer-Judged Hackathons" },
+      { title: "Code the Cup — Peer-Judged Hackathons" },
       { name: "description", content: "Run high-energy peer-voted hackathons. Fair, anonymous, weighted scoring with a Kahoot-style winner reveal." },
-      { property: "og:title", content: "HackVote — Peer-Judged Hackathons" },
+      { property: "og:title", content: "Code the Cup — Peer-Judged Hackathons" },
       { property: "og:description", content: "Run high-energy peer-voted hackathons. Fair, anonymous, weighted scoring with a Kahoot-style winner reveal." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "HackVote — Peer-Judged Hackathons" },
+      { name: "twitter:title", content: "Code the Cup — Peer-Judged Hackathons" },
       { name: "twitter:description", content: "Run high-energy peer-voted hackathons. Fair, anonymous, weighted scoring with a Kahoot-style winner reveal." },
     ],
     links: [

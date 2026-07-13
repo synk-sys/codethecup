@@ -9,7 +9,7 @@ import { Trophy, Lock } from "lucide-react";
 import { motion } from "framer-motion";
 
 export const Route = createFileRoute("/_authenticated/results")({
-  head: () => ({ meta: [{ title: "Results — HackVote" }] }),
+  head: () => ({ meta: [{ title: "Results — Code the Cup" }] }),
   component: ResultsPage,
 });
 

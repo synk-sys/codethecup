@@ -39,7 +39,7 @@ function AuthedLayout() {
               <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary text-primary-foreground">
                 <Trophy className="h-4 w-4" />
               </div>
-              <span className="gradient-text hidden sm:inline">HackVote</span>
+              <span className="gradient-text hidden sm:inline">Code the Cup</span>
             </Link>
             <nav className="flex items-center gap-1 text-sm min-w-0 overflow-x-auto no-scrollbar">
               <NavLink to="/vote" label="Vote" />

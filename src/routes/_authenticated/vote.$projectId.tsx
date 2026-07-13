@@ -14,7 +14,7 @@ import { ArrowLeft, ExternalLink, Github, MapPin, Save, Send, Sparkles, CheckCir
 import confetti from "canvas-confetti";
 
 export const Route = createFileRoute("/_authenticated/vote/$projectId")({
-  head: () => ({ meta: [{ title: "Vote — HackVote" }] }),
+  head: () => ({ meta: [{ title: "Vote — Code the Cup" }] }),
   component: VotePage,
 });
 

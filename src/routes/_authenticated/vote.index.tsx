@@ -13,7 +13,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 
 export const Route = createFileRoute("/_authenticated/vote/")({
-  head: () => ({ meta: [{ title: "Vote — HackVote" }] }),
+  head: () => ({ meta: [{ title: "Vote — Code the Cup" }] }),
   component: VoteDashboard,
 });
 
