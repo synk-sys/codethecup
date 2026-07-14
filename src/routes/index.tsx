@@ -237,7 +237,7 @@ function Landing() {
           </div>
           <span className="gradient-text">Code the Cup</span>
         </Link>
-        <Link to="/auth"><Button variant="secondary" className="font-semibold">Sign in</Button></Link>
+        <Link to="/auth" search={{ mode: "admin" }}><Button variant="secondary" className="font-semibold">Sign in</Button></Link>
       </nav>
 
       <main className="container mx-auto px-6 pt-16 pb-24 relative overflow-hidden">
