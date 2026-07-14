@@ -1,10 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchActiveEvent } from "@/lib/auth-helpers";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/challenges")({
   component: ChallengesPage,
@@ -24,7 +22,6 @@ const CODE_THE_CUP_CHALLENGES = [
 ];
 
 function ChallengesPage() {
-  const qc = useQueryClient();
   const q = useQuery({
     queryKey: ["admin-challenges"],
     queryFn: async () => {
@@ -43,10 +40,6 @@ function ChallengesPage() {
       return { event, challenges: data ?? [] };
     },
   });
-  async function del(id: string) {
-    await supabase.from("challenges").delete().eq("id", id);
-    qc.invalidateQueries({ queryKey: ["admin-challenges"] });
-  }
   if (!q.data) return <div>Loading...</div>;
   return (
     <div className="space-y-6 max-w-3xl">
@@ -64,7 +57,6 @@ function ChallengesPage() {
               <div className="font-bold">{c.name}</div>
               <div className="text-sm text-muted-foreground mt-0.5">{c.sponsor && `${c.sponsor} • `}{c.description}</div>
             </div>
-            <Button size="sm" variant="ghost" onClick={() => del(c.id)}><Trash2 className="h-4 w-4" /></Button>
           </div>
         ))}
       </Card>
