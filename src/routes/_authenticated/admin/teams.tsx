@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { useState } from "react";
-import { Plus, Trash2, Users, Pencil, Trophy } from "lucide-react";
+import { Plus, Trash2, Users, Pencil, Trophy, Shirt } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/teams")({
   component: TeamsPage,
@@ -135,10 +135,20 @@ function TeamsPage() {
 
   return (
     <div className="space-y-4 max-w-5xl mx-auto">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-black">Teams</h1>
+      <div
+        className="relative overflow-hidden rounded-2xl p-5 flex items-center justify-between gap-3"
+        style={{ background: "linear-gradient(120deg, #006633 0%, #0a8a44 100%)", boxShadow: "0 0 0 3px #ffcc00" }}
+      >
+        <div
+          className="absolute inset-0 opacity-10 pointer-events-none"
+          style={{ backgroundImage: "repeating-linear-gradient(45deg, #fff 0, #fff 2px, transparent 2px, transparent 14px)" }}
+        />
+        <div className="relative flex items-center gap-2 text-white">
+          <Trophy className="h-6 w-6 text-yellow-300" />
+          <h1 className="text-3xl font-black tracking-wide">Teams</h1>
+        </div>
         <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild><Button><Plus className="h-4 w-4 mr-2" /> Add team</Button></DialogTrigger>
+          <DialogTrigger asChild><Button className="relative bg-yellow-400 text-[#006633] hover:bg-yellow-300 font-bold"><Plus className="h-4 w-4 mr-2" /> Add team</Button></DialogTrigger>
           <DialogContent className="max-w-lg">
             <DialogHeader><DialogTitle>New team</DialogTitle></DialogHeader>
             <div className="space-y-3">
@@ -168,10 +178,15 @@ function TeamsPage() {
           const members = membersByTeam.get(t.id) ?? [];
           const ch = p?.challenge_id ? challengeById.get(p.challenge_id) : null;
           return (
-            <Card key={t.id} className="p-5 glass cursor-pointer hover:border-primary/60 transition" onClick={() => setViewingId(t.id)}>
+            <Card
+              key={t.id}
+              className="p-5 glass cursor-pointer hover:border-yellow-400/60 transition border-l-4"
+              style={{ borderLeftColor: "#ffcc00" }}
+              onClick={() => setViewingId(t.id)}
+            >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2"><Users className="h-4 w-4 text-primary" /><h3 className="font-bold">{t.name}</h3></div>
+                  <div className="flex items-center gap-2"><Shirt className="h-4 w-4 text-primary" /><h3 className="font-bold">{t.name}</h3></div>
                   {p && <div className="mt-1"><div className="font-semibold">{p.title}</div><div className="text-sm text-muted-foreground">{p.description}</div></div>}
                   <div className="mt-2 flex flex-wrap gap-2 text-xs text-muted-foreground">
                     {ch && <span>Challenge: {ch.name}</span>}
