@@ -175,8 +175,7 @@ function TeamsPage() {
                   {p && <div className="mt-1"><div className="font-semibold">{p.title}</div><div className="text-sm text-muted-foreground">{p.description}</div></div>}
                   <div className="mt-2 flex flex-wrap gap-2 text-xs text-muted-foreground">
                     {ch && <span>Challenge: {ch.name}</span>}
-                    {p?.table_number && <span>{p.table_number} member{p.table_number === "1" ? "" : "s"}</span>}
-                    <span>{members.length} member{members.length === 1 ? "" : "s"}</span>
+                    <span>{p?.table_number ?? members.length} member{(p?.table_number ?? members.length) === "1" || (p?.table_number ?? members.length) === 1 ? "" : "s"}</span>
                   </div>
                   {members.length > 0 && <div className="mt-2 text-xs text-muted-foreground">{members.map((m) => m.email).join(", ")}</div>}
                 </div>
