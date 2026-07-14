@@ -60,15 +60,13 @@ function TeamsPage() {
     const { data: team, error: e1 } = await supabase.from("teams").insert({ event_id: q.data.event.id, name: form.teamName }).select().single();
     if (e1) return toast.error(e1.message);
     await supabase.from("team_passcodes").insert({ team_id: team.id, passcode: randomPasscode() });
-    if (form.title.trim()) {
-      const { error: e2 } = await supabase.from("projects").insert({
-        event_id: q.data.event.id, team_id: team.id, title: form.title,
-        description: form.description, challenge_id: form.challenge_id || null,
-        demo_url: form.demo_url || null, github_url: form.github_url || null,
-        table_number: form.table_number || null,
-      });
-      if (e2) return toast.error(e2.message);
-    }
+    const { error: e2 } = await supabase.from("projects").insert({
+      event_id: q.data.event.id, team_id: team.id, title: form.title.trim() || null,
+      description: form.description, challenge_id: form.challenge_id || null,
+      demo_url: form.demo_url || null, github_url: form.github_url || null,
+      table_number: form.table_number || null,
+    });
+    if (e2) return toast.error(e2.message);
     const names = form.names.split(/[,\n]/).map((n) => n.trim()).filter(Boolean);
     if (names.length) {
       await supabase.from("team_members").insert(names.map((name) => ({ team_id: team.id, name })));

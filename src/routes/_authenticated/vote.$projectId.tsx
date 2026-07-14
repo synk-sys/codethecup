@@ -144,8 +144,8 @@ function VotePage() {
                 {challenge.name}
               </Badge>
             )}
-            <h1 className="text-3xl font-black leading-tight">{project.title}</h1>
-            <p className="text-muted-foreground mt-1">{team?.name}</p>
+            <h1 className="text-3xl font-black leading-tight">{project.title || team?.name}</h1>
+            {project.title && <p className="text-muted-foreground mt-1">{team?.name}</p>}
             {project.description && <p className="mt-4 text-sm leading-relaxed">{project.description}</p>}
           </div>
           {project.image_url && (

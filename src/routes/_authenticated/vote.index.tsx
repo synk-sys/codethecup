@@ -151,7 +151,7 @@ function VoteDashboard() {
                         </Badge>
                       )}
                     </div>
-                    <h3 className="text-lg font-bold leading-tight line-clamp-2">{p.title}</h3>
+                    <h3 className="text-lg font-bold leading-tight line-clamp-2">{p.title || team?.name}</h3>
                     <p className="text-sm text-muted-foreground mt-1">{team?.name}</p>
                     {p.description && <p className="text-sm text-muted-foreground/80 mt-3 line-clamp-3">{p.description}</p>}
                     <div className="mt-4 pt-4 border-t border-border/60 flex items-center justify-end text-xs text-muted-foreground">
