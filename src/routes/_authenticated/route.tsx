@@ -27,7 +27,7 @@ function AuthedLayout() {
     qc.clear();
     await supabase.auth.signOut();
     router.invalidate();
-    navigate({ to: "/auth", replace: true });
+    navigate({ to: "/", replace: true });
   }
 
   return (
