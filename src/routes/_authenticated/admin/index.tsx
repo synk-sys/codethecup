@@ -5,7 +5,7 @@ import { fetchActiveEvent } from "@/lib/auth-helpers";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Users, ClipboardCheck, Target, Award, Play, ArrowRight } from "lucide-react";
+import { Users, ClipboardCheck, Award, Play, ArrowRight } from "lucide-react";
 
 const GOOGLE_COLORS = ["#4285F4", "#EA4335", "#FBBC05", "#34A853"];
 
@@ -19,15 +19,14 @@ function AdminDash() {
     queryFn: async () => {
       const event = await fetchActiveEvent();
       if (!event) return null;
-      const [{ count: teamsCount }, { count: projectsCount }, { data: ballots }, { count: challengesCount }] = await Promise.all([
+      const [{ count: teamsCount }, { data: ballots }, { count: challengesCount }] = await Promise.all([
         supabase.from("teams").select("id", { count: "exact", head: true }).eq("event_id", event.id),
-        supabase.from("projects").select("id", { count: "exact", head: true }).eq("event_id", event.id),
         supabase.from("ballots").select("id, status").eq("event_id", event.id),
         supabase.from("challenges").select("id", { count: "exact", head: true }).eq("event_id", event.id),
       ]);
       const submitted = (ballots ?? []).filter((b) => b.status === "submitted").length;
       const drafts = (ballots ?? []).filter((b) => b.status === "draft").length;
-      return { event, teamsCount: teamsCount ?? 0, projectsCount: projectsCount ?? 0, submitted, drafts, challengesCount: challengesCount ?? 0 };
+      return { event, teamsCount: teamsCount ?? 0, submitted, drafts, challengesCount: challengesCount ?? 0 };
     },
   });
 
@@ -49,7 +48,7 @@ function AdminDash() {
     );
   }
 
-  const { event, teamsCount, projectsCount, submitted, drafts, challengesCount } = q.data;
+  const { event, teamsCount, submitted, drafts, challengesCount } = q.data;
 
   return (
     <div className="space-y-6">
@@ -57,9 +56,8 @@ function AdminDash() {
         <h1 className="text-4xl font-black">{event.name}</h1>
         {event.description && <p className="text-muted-foreground">{event.description}</p>}
       </div>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-3">
         <Stat icon={Users} label="Teams" value={teamsCount} color={GOOGLE_COLORS[0]} />
-        <Stat icon={Target} label="Projects" value={projectsCount} color={GOOGLE_COLORS[1]} />
         <Stat icon={ClipboardCheck} label="Votes submitted" value={submitted} sub={`${drafts} drafts`} color={GOOGLE_COLORS[2]} />
         <Stat icon={Award} label="Challenges" value={challengesCount} color={GOOGLE_COLORS[3]} />
       </div>
