@@ -90,7 +90,7 @@ function VoteDashboard() {
           <Progress value={pct} className="mt-3 h-3" />
           {settings && submitted < total && !votingClosed && (
             <p className="mt-2 text-xs text-muted-foreground">
-              Keep going — every vote counts. Scoring uses {settings.score_scale_min}–{settings.score_scale_max}.
+              Keep going — every vote counts.
             </p>
           )}
         </Card>
