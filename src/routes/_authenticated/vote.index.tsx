@@ -92,7 +92,7 @@ function VoteDashboard() {
         <Card className="mt-6 p-5 glass">
           <div className="flex items-center justify-between text-sm font-medium">
             <span>Your progress</span>
-            <span className="tabular-nums">{submitted} of {total} projects evaluated</span>
+            <span className="tabular-nums">{submitted} of {total}</span>
           </div>
           <Progress value={pct} className="mt-3 h-3" />
           {settings && submitted < total && !votingClosed && (
