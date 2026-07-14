@@ -27,7 +27,7 @@ const NAV: { to: string; label: string; icon: any; exact?: boolean }[] = [
 function AdminLayout() {
   return (
     <div className="container mx-auto px-4 sm:px-6 py-6 max-w-7xl">
-      <div className="mb-6 flex gap-1 overflow-x-auto no-scrollbar border-b border-border/60 pb-1">
+      <div className="mb-6 flex gap-1 justify-center overflow-x-auto no-scrollbar border-b border-border/60 pb-1">
         {NAV.map(({ to, label, icon: Icon, exact }) => (
           <Link
             key={to}
