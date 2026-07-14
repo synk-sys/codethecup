@@ -257,7 +257,6 @@ function TeamsPage() {
                 />
                 <div className="relative">
                   <Trophy className="h-10 w-10 mx-auto mb-3 text-yellow-300 drop-shadow" />
-                  <div className="text-xs tracking-[0.3em] uppercase text-yellow-200 font-semibold mb-1">Code the Cup</div>
                   <h2 className="text-3xl font-black uppercase tracking-wide drop-shadow-sm mb-3">{t.name}</h2>
                   {ch && (
                     <div className="inline-block mb-4 px-4 py-1 rounded-full bg-white/15 backdrop-blur text-sm font-semibold border border-white/30">
