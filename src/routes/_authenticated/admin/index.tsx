@@ -55,7 +55,7 @@ function AdminDash() {
     <div className="space-y-6">
       <div>
         <h1 className="text-4xl font-black">{event.name}</h1>
-        <p className="text-muted-foreground">{event.description}</p>
+        {event.description && <p className="text-muted-foreground">{event.description}</p>}
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Stat icon={Users} label="Teams" value={teamsCount} color={GOOGLE_COLORS[0]} />

@@ -326,7 +326,7 @@ declare
   new_event_id uuid;
 begin
   insert into public.events (name, description, event_date, is_active)
-  values ('Code the Cup', 'Peer-judged hackathon', current_date, true)
+  values ('Code the Cup', null, current_date, true)
   returning id into new_event_id;
 
   insert into public.event_settings (event_id) values (new_event_id);
