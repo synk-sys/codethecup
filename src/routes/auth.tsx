@@ -97,9 +97,9 @@ function AuthPage() {
           <Card className="p-8 glass">
             <div className="mb-6">
               <h2 className="text-2xl font-bold">Sign in to Code the Cup</h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                {lockedMode ? "Sign in to vote on projects." : "Choose how you're joining the event."}
-              </p>
+              {!lockedMode && (
+                <p className="text-sm text-muted-foreground mt-1">Choose how you're joining the event.</p>
+              )}
             </div>
 
             <Tabs value={mode} onValueChange={(v) => setMode(v as "participant" | "admin")}>
