@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { useState } from "react";
-import { Plus, Trash2, Users } from "lucide-react";
+import { Plus, Trash2, Users, Pencil } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/teams")({
   component: TeamsPage,
@@ -74,6 +74,54 @@ function TeamsPage() {
     qc.invalidateQueries({ queryKey: ["admin-teams"] });
   }
 
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState({
+    title: "", description: "", challenge_id: "",
+    demo_url: "", github_url: "", table_number: "", emails: "",
+  });
+
+  function openEdit(teamId: string, project: any, members: any[]) {
+    setEditingId(teamId);
+    setEditForm({
+      title: project?.title ?? "",
+      description: project?.description ?? "",
+      challenge_id: project?.challenge_id ?? "",
+      demo_url: project?.demo_url ?? "",
+      github_url: project?.github_url ?? "",
+      table_number: project?.table_number ?? "",
+      emails: members.map((m) => m.email).join(", "),
+    });
+  }
+
+  async function saveEdit(teamId: string, existingProject: any) {
+    if (!q.data) return;
+    if (existingProject) {
+      const { error } = await supabase.from("projects").update({
+        title: editForm.title, description: editForm.description,
+        challenge_id: editForm.challenge_id || null,
+        demo_url: editForm.demo_url || null, github_url: editForm.github_url || null,
+        table_number: editForm.table_number || null,
+      }).eq("id", existingProject.id);
+      if (error) return toast.error(error.message);
+    } else if (editForm.title.trim()) {
+      const { error } = await supabase.from("projects").insert({
+        event_id: q.data.event.id, team_id: teamId, title: editForm.title,
+        description: editForm.description, challenge_id: editForm.challenge_id || null,
+        demo_url: editForm.demo_url || null, github_url: editForm.github_url || null,
+        table_number: editForm.table_number || null,
+      });
+      if (error) return toast.error(error.message);
+    }
+    const emails = editForm.emails.split(/[,\n]/).map((e) => e.trim()).filter(Boolean);
+    await supabase.from("team_members").delete().eq("team_id", teamId);
+    if (emails.length) {
+      await supabase.from("team_members").insert(emails.map((email) => ({ team_id: teamId, email })));
+    }
+    toast.success("Team updated");
+    setEditingId(null);
+    qc.invalidateQueries({ queryKey: ["admin-teams"] });
+  }
+
   if (!q.data) return <div>Loading...</div>;
   const membersByTeam = new Map<string, any[]>();
   for (const m of q.data.members) {
@@ -130,12 +178,37 @@ function TeamsPage() {
                   </div>
                   {members.length > 0 && <div className="mt-2 text-xs text-muted-foreground">{members.map((m) => m.email).join(", ")}</div>}
                 </div>
-                <Button variant="ghost" size="icon" onClick={() => delTeam(t.id)}><Trash2 className="h-4 w-4" /></Button>
+                <div className="flex gap-1">
+                  <Button variant="ghost" size="icon" onClick={() => openEdit(t.id, p, members)}><Pencil className="h-4 w-4" /></Button>
+                  <Button variant="ghost" size="icon" onClick={() => delTeam(t.id)}><Trash2 className="h-4 w-4" /></Button>
+                </div>
               </div>
             </Card>
           );
         })}
       </div>
+      <Dialog open={!!editingId} onOpenChange={(v) => !v && setEditingId(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader><DialogTitle>Edit team details</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div><Label>Project title</Label><Input value={editForm.title} onChange={(e) => setEditForm({ ...editForm, title: e.target.value })} /></div>
+            <div><Label>Description</Label><Textarea value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} /></div>
+            <div><Label>Challenge</Label>
+              <Select value={editForm.challenge_id} onValueChange={(v) => setEditForm({ ...editForm, challenge_id: v })}>
+                <SelectTrigger><SelectValue placeholder="None" /></SelectTrigger>
+                <SelectContent>{q.data.challenges.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div><Label>Demo URL</Label><Input value={editForm.demo_url} onChange={(e) => setEditForm({ ...editForm, demo_url: e.target.value })} /></div>
+              <div><Label>GitHub</Label><Input value={editForm.github_url} onChange={(e) => setEditForm({ ...editForm, github_url: e.target.value })} /></div>
+            </div>
+            <div><Label>Table number</Label><Input value={editForm.table_number} onChange={(e) => setEditForm({ ...editForm, table_number: e.target.value })} /></div>
+            <div><Label>Participant emails (comma or newline)</Label><Textarea value={editForm.emails} onChange={(e) => setEditForm({ ...editForm, emails: e.target.value })} rows={3} /></div>
+            <Button onClick={() => editingId && saveEdit(editingId, projectByTeam.get(editingId))} className="w-full">Save</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
