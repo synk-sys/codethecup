@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, ArrowRight, Ban, CheckCircle2, Clock, Circle } from "lucide-react";
+import { Search, ArrowRight, Ban, CheckCircle2, Clock, Circle, AlertTriangle } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
 
@@ -81,6 +81,13 @@ function VoteDashboard() {
           </div>
           {votingClosed && <Badge variant="secondary" className="text-sm">Voting closed</Badge>}
         </div>
+
+        {!myTeamId && (
+          <Card className="mt-6 p-4 glass flex items-center gap-3 text-sm border-warning/40">
+            <AlertTriangle className="h-4 w-4 text-warning shrink-0" />
+            <span className="text-muted-foreground">Your account isn't linked to a team yet — ask an organizer to check you in.</span>
+          </Card>
+        )}
 
         <Card className="mt-6 p-5 glass">
           <div className="flex items-center justify-between text-sm font-medium">

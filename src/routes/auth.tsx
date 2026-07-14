@@ -2,10 +2,12 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchActiveEvent } from "@/lib/auth-helpers";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Trophy } from "lucide-react";
@@ -29,51 +31,62 @@ function AuthPage() {
   const [mode, setMode] = useState<"participant" | "admin">(lockedMode ?? "participant");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [displayName, setDisplayName] = useState("");
-  const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const [teams, setTeams] = useState<{ id: string; name: string }[]>([]);
+  const [teamId, setTeamId] = useState("");
+  const [members, setMembers] = useState<{ id: string; name: string }[]>([]);
+  const [memberId, setMemberId] = useState("");
+  const [passcode, setPasscode] = useState("");
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/" });
+      if (data.session && !data.session.user.is_anonymous) navigate({ to: "/" });
     });
   }, [navigate]);
 
-  async function sendMagicLink(e: React.FormEvent) {
+  useEffect(() => {
+    if (mode !== "participant") return;
+    (async () => {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) await supabase.auth.signInAnonymously();
+      const event = await fetchActiveEvent();
+      if (!event) return;
+      const { data: teamRows } = await supabase.from("teams").select("id,name").eq("event_id", event.id).order("name");
+      setTeams(teamRows ?? []);
+    })();
+  }, [mode]);
+
+  useEffect(() => {
+    if (!teamId) return setMembers([]);
+    (async () => {
+      const { data } = await supabase.from("team_members").select("id,name").eq("team_id", teamId).not("name", "is", null).order("name");
+      setMembers((data ?? []) as { id: string; name: string }[]);
+    })();
+  }, [teamId]);
+
+  async function joinAsParticipant(e: React.FormEvent) {
     e.preventDefault();
+    if (!memberId || !passcode.trim()) return toast.error("Pick your name and enter the passcode");
     setLoading(true);
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: window.location.origin },
+    const { error } = await supabase.rpc("claim_team_member", {
+      _team_member_id: memberId,
+      _passcode: passcode.trim().toUpperCase(),
     });
     setLoading(false);
-    if (error) toast.error(error.message);
-    else toast.success("Check your email for a sign-in link!");
+    if (error) return toast.error(error.message);
+    toast.success("You're in!");
+    navigate({ to: "/vote" });
   }
 
   async function passwordAuth(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    if (isSignUp) {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: window.location.origin,
-          data: { display_name: displayName || email.split("@")[0] },
-        },
-      });
-      setLoading(false);
-      if (error) return toast.error(error.message);
-      toast.success("Account created! You can now sign in.");
-      setIsSignUp(false);
-    } else {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      setLoading(false);
-      if (error) return toast.error(error.message);
-      toast.success("Welcome back!");
-      navigate({ to: mode === "admin" ? "/admin" : "/vote" });
-    }
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    setLoading(false);
+    if (error) return toast.error(error.message);
+    toast.success("Welcome back!");
+    navigate({ to: "/admin" });
   }
 
   return (
@@ -111,47 +124,32 @@ function AuthPage() {
               )}
 
               <TabsContent value="participant" className="mt-6 space-y-4">
-                {lockedMode === "participant" ? (
-                  <>
-                    <form onSubmit={sendMagicLink} className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="email-p">Email</Label>
-                        <Input id="email-p" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@team.com" />
-                      </div>
-                      <Button type="submit" disabled={loading} className="w-full h-11 font-semibold">
-                        {loading ? "Sending..." : "Send magic link"}
-                      </Button>
-                    </form>
-                    <p className="text-xs text-muted-foreground text-center">
-                      Use the email your team lead added to the roster.
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <form onSubmit={passwordAuth} className="space-y-4">
-                      {isSignUp && (
-                        <div className="space-y-2">
-                          <Label htmlFor="name-p">Display name</Label>
-                          <Input id="name-p" value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="Your name" />
-                        </div>
-                      )}
-                      <div className="space-y-2">
-                        <Label htmlFor="email-p">Email</Label>
-                        <Input id="email-p" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@team.com" />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="password-p">Password</Label>
-                        <Input id="password-p" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
-                      </div>
-                      <Button type="submit" disabled={loading} className="w-full h-11 font-semibold">
-                        {loading ? "..." : isSignUp ? "Create account" : "Sign in"}
-                      </Button>
-                    </form>
-                    <button type="button" onClick={() => setIsSignUp((v) => !v)} className="text-xs text-muted-foreground hover:text-foreground w-full text-center">
-                      {isSignUp ? "Already have an account? Sign in" : "First time? Create an account"}
-                    </button>
-                  </>
-                )}
+                <form onSubmit={joinAsParticipant} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>Team</Label>
+                    <Select value={teamId} onValueChange={(v) => { setTeamId(v); setMemberId(""); }}>
+                      <SelectTrigger><SelectValue placeholder="Select your team" /></SelectTrigger>
+                      <SelectContent>{teams.map((t) => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}</SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Your name</Label>
+                    <Select value={memberId} onValueChange={setMemberId} disabled={!teamId}>
+                      <SelectTrigger><SelectValue placeholder="Select your name" /></SelectTrigger>
+                      <SelectContent>{members.map((m) => <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>)}</SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="passcode">Team passcode</Label>
+                    <Input id="passcode" required value={passcode} onChange={(e) => setPasscode(e.target.value)} placeholder="e.g. AB12CD" className="uppercase tracking-widest" />
+                  </div>
+                  <Button type="submit" disabled={loading} className="w-full h-11 font-semibold">
+                    {loading ? "Joining..." : "Join"}
+                  </Button>
+                </form>
+                <p className="text-xs text-muted-foreground text-center">
+                  Ask an organizer for your team's passcode.
+                </p>
               </TabsContent>
 
               <TabsContent value="admin" className="mt-6 space-y-4">

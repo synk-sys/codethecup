@@ -11,11 +11,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { useState } from "react";
-import { Plus, Trash2, Users, Pencil, Trophy, Shirt } from "lucide-react";
+import { Plus, Trash2, Pencil, Trophy, Shirt, RefreshCw, Unlink } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/teams")({
   component: TeamsPage,
 });
+
+function randomPasscode() {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let out = "";
+  for (let i = 0; i < 6; i++) out += chars[Math.floor(Math.random() * chars.length)];
+  return out;
+}
 
 function TeamsPage() {
   const qc = useQueryClient();
@@ -24,11 +31,12 @@ function TeamsPage() {
     queryFn: async () => {
       const event = await fetchActiveEvent();
       if (!event) return null;
-      const [teams, projects, members, challenges] = await Promise.all([
+      const [teams, projects, members, challenges, passcodes] = await Promise.all([
         supabase.from("teams").select("*").eq("event_id", event.id),
         supabase.from("projects").select("*").eq("event_id", event.id),
         supabase.from("team_members").select("*"),
         supabase.from("challenges").select("*").eq("event_id", event.id),
+        supabase.from("team_passcodes").select("*"),
       ]);
       return {
         event,
@@ -36,6 +44,7 @@ function TeamsPage() {
         projects: projects.data ?? [],
         members: members.data ?? [],
         challenges: challenges.data ?? [],
+        passcodes: passcodes.data ?? [],
       };
     },
   });
@@ -43,13 +52,14 @@ function TeamsPage() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
     teamName: "", title: "", description: "", challenge_id: "",
-    demo_url: "", github_url: "", table_number: "", emails: "",
+    demo_url: "", github_url: "", table_number: "", names: "",
   });
 
   async function create() {
     if (!q.data || !form.teamName.trim()) return toast.error("Team / individual name required");
     const { data: team, error: e1 } = await supabase.from("teams").insert({ event_id: q.data.event.id, name: form.teamName }).select().single();
     if (e1) return toast.error(e1.message);
+    await supabase.from("team_passcodes").insert({ team_id: team.id, passcode: randomPasscode() });
     if (form.title.trim()) {
       const { error: e2 } = await supabase.from("projects").insert({
         event_id: q.data.event.id, team_id: team.id, title: form.title,
@@ -59,12 +69,12 @@ function TeamsPage() {
       });
       if (e2) return toast.error(e2.message);
     }
-    const emails = form.emails.split(/[,\n]/).map((e) => e.trim()).filter(Boolean);
-    if (emails.length) {
-      await supabase.from("team_members").insert(emails.map((email) => ({ team_id: team.id, email })));
+    const names = form.names.split(/[,\n]/).map((n) => n.trim()).filter(Boolean);
+    if (names.length) {
+      await supabase.from("team_members").insert(names.map((name) => ({ team_id: team.id, name })));
     }
     toast.success("Team created");
-    setForm({ teamName: "", title: "", description: "", challenge_id: "", demo_url: "", github_url: "", table_number: "", emails: "" });
+    setForm({ teamName: "", title: "", description: "", challenge_id: "", demo_url: "", github_url: "", table_number: "", names: "" });
     setOpen(false);
     qc.invalidateQueries({ queryKey: ["admin-teams"] });
   }
@@ -74,10 +84,24 @@ function TeamsPage() {
     qc.invalidateQueries({ queryKey: ["admin-teams"] });
   }
 
+  async function regeneratePasscode(teamId: string) {
+    const { error } = await supabase.from("team_passcodes").update({ passcode: randomPasscode(), updated_at: new Date().toISOString() }).eq("team_id", teamId);
+    if (error) return toast.error(error.message);
+    toast.success("Passcode regenerated");
+    qc.invalidateQueries({ queryKey: ["admin-teams"] });
+  }
+
+  async function unlinkMember(memberId: string) {
+    const { error } = await supabase.from("team_members").update({ user_id: null }).eq("id", memberId);
+    if (error) return toast.error(error.message);
+    toast.success("Unlinked — this name can be claimed again");
+    qc.invalidateQueries({ queryKey: ["admin-teams"] });
+  }
+
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({
     title: "", description: "", challenge_id: "",
-    demo_url: "", github_url: "", table_number: "", emails: "",
+    demo_url: "", github_url: "", table_number: "", names: "",
   });
 
   function openEdit(teamId: string, project: any, members: any[]) {
@@ -89,7 +113,7 @@ function TeamsPage() {
       demo_url: project?.demo_url ?? "",
       github_url: project?.github_url ?? "",
       table_number: project?.table_number ?? "",
-      emails: members.map((m) => m.email).join(", "),
+      names: members.map((m) => m.name).filter(Boolean).join(", "),
     });
   }
 
@@ -114,10 +138,10 @@ function TeamsPage() {
       });
       if (error) return toast.error(error.message);
     }
-    const emails = editForm.emails.split(/[,\n]/).map((e) => e.trim()).filter(Boolean);
+    const names = editForm.names.split(/[,\n]/).map((n) => n.trim()).filter(Boolean);
     await supabase.from("team_members").delete().eq("team_id", teamId);
-    if (emails.length) {
-      await supabase.from("team_members").insert(emails.map((email) => ({ team_id: teamId, email })));
+    if (names.length) {
+      await supabase.from("team_members").insert(names.map((name) => ({ team_id: teamId, name })));
     }
     toast.success("Team updated");
     setEditingId(null);
@@ -134,6 +158,7 @@ function TeamsPage() {
   }
   const projectByTeam = new Map(q.data.projects.map((p) => [p.team_id, p]));
   const challengeById = new Map(q.data.challenges.map((c) => [c.id, c]));
+  const passcodeByTeam = new Map(q.data.passcodes.map((p) => [p.team_id, p.passcode]));
 
   return (
     <div className="space-y-4 max-w-5xl mx-auto">
@@ -168,7 +193,7 @@ function TeamsPage() {
                 <div><Label>GitHub</Label><Input value={form.github_url} onChange={(e) => setForm({ ...form, github_url: e.target.value })} /></div>
               </div>
               <div><Label>Number of members</Label><Input type="number" min={1} value={form.table_number} onChange={(e) => setForm({ ...form, table_number: e.target.value })} /></div>
-              <div><Label>Participant emails (comma or newline)</Label><Textarea value={form.emails} onChange={(e) => setForm({ ...form, emails: e.target.value })} rows={3} /></div>
+              <div><Label>Participant names (comma or newline)</Label><Textarea value={form.names} onChange={(e) => setForm({ ...form, names: e.target.value })} rows={3} /></div>
               <Button onClick={create} className="w-full">Create</Button>
             </div>
           </DialogContent>
@@ -179,6 +204,7 @@ function TeamsPage() {
           const p = projectByTeam.get(t.id);
           const members = membersByTeam.get(t.id) ?? [];
           const ch = p?.challenge_id ? challengeById.get(p.challenge_id) : null;
+          const passcode = passcodeByTeam.get(t.id);
           return (
             <Card
               key={t.id}
@@ -193,8 +219,16 @@ function TeamsPage() {
                   <div className="mt-2 flex flex-wrap gap-2 text-xs text-muted-foreground">
                     {ch && <span>Challenge: {ch.name}</span>}
                     <span>{p?.table_number ?? members.length} member{(p?.table_number ?? members.length) === "1" || (p?.table_number ?? members.length) === 1 ? "" : "s"}</span>
+                    {passcode && (
+                      <span className="inline-flex items-center gap-1 font-mono font-bold text-foreground" onClick={(e) => e.stopPropagation()}>
+                        Passcode: {passcode}
+                        <button type="button" title="Regenerate" onClick={() => regeneratePasscode(t.id)} className="text-muted-foreground hover:text-foreground">
+                          <RefreshCw className="h-3 w-3" />
+                        </button>
+                      </span>
+                    )}
                   </div>
-                  {members.length > 0 && <div className="mt-2 text-xs text-muted-foreground">{members.map((m) => m.email).join(", ")}</div>}
+                  {members.length > 0 && <div className="mt-2 text-xs text-muted-foreground">{members.map((m) => m.name).filter(Boolean).join(", ")}</div>}
                 </div>
                 <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
                   <Button variant="ghost" size="icon" onClick={() => openEdit(t.id, p, members)}><Pencil className="h-4 w-4" /></Button>
@@ -222,7 +256,19 @@ function TeamsPage() {
               <div><Label>GitHub</Label><Input value={editForm.github_url} onChange={(e) => setEditForm({ ...editForm, github_url: e.target.value })} /></div>
             </div>
             <div><Label>Number of members</Label><Input type="number" min={1} value={editForm.table_number} onChange={(e) => setEditForm({ ...editForm, table_number: e.target.value })} /></div>
-            <div><Label>Participant emails (comma or newline)</Label><Textarea value={editForm.emails} onChange={(e) => setEditForm({ ...editForm, emails: e.target.value })} rows={3} /></div>
+            <div><Label>Participant names (comma or newline)</Label><Textarea value={editForm.names} onChange={(e) => setEditForm({ ...editForm, names: e.target.value })} rows={3} /></div>
+            {editingId && (
+              <div className="space-y-1">
+                {(membersByTeam.get(editingId) ?? []).filter((m) => m.user_id).map((m) => (
+                  <div key={m.id} className="flex items-center justify-between text-xs bg-muted/40 rounded-md px-2 py-1">
+                    <span>{m.name} — joined</span>
+                    <button type="button" onClick={() => unlinkMember(m.id)} className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground">
+                      <Unlink className="h-3 w-3" /> Unlink
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
             <Button
               onClick={() => editingId && saveEdit(editingId, projectByTeam.get(editingId))}
               className="w-full"
@@ -271,7 +317,8 @@ function TeamsPage() {
                         {members.map((m, i) => (
                           <li key={m.id} className="flex items-center gap-3 text-sm">
                             <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-yellow-300 text-[#006633] font-black text-xs">{i + 1}</span>
-                            <span className="font-medium">{m.name || m.email}</span>
+                            <span className="font-medium">{m.name || "Unnamed"}</span>
+                            {m.user_id && <span className="text-[10px] uppercase tracking-wide text-yellow-200/80 ml-auto">Joined</span>}
                           </li>
                         ))}
                       </ul>
