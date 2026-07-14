@@ -47,16 +47,18 @@ function TeamsPage() {
   });
 
   async function create() {
-    if (!q.data || !form.teamName || !form.title) return toast.error("Team & title required");
+    if (!q.data || !form.teamName.trim()) return toast.error("Team / individual name required");
     const { data: team, error: e1 } = await supabase.from("teams").insert({ event_id: q.data.event.id, name: form.teamName }).select().single();
     if (e1) return toast.error(e1.message);
-    const { error: e2 } = await supabase.from("projects").insert({
-      event_id: q.data.event.id, team_id: team.id, title: form.title,
-      description: form.description, challenge_id: form.challenge_id || null,
-      demo_url: form.demo_url || null, github_url: form.github_url || null,
-      table_number: form.table_number || null,
-    });
-    if (e2) return toast.error(e2.message);
+    if (form.title.trim()) {
+      const { error: e2 } = await supabase.from("projects").insert({
+        event_id: q.data.event.id, team_id: team.id, title: form.title,
+        description: form.description, challenge_id: form.challenge_id || null,
+        demo_url: form.demo_url || null, github_url: form.github_url || null,
+        table_number: form.table_number || null,
+      });
+      if (e2) return toast.error(e2.message);
+    }
     const emails = form.emails.split(/[,\n]/).map((e) => e.trim()).filter(Boolean);
     if (emails.length) {
       await supabase.from("team_members").insert(emails.map((email) => ({ team_id: team.id, email })));
@@ -91,7 +93,7 @@ function TeamsPage() {
             <DialogHeader><DialogTitle>New team & project</DialogTitle></DialogHeader>
             <div className="space-y-3">
               <div><Label>Team / individual name</Label><Input value={form.teamName} onChange={(e) => setForm({ ...form, teamName: e.target.value })} /></div>
-              <div><Label>Project title</Label><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} /></div>
+              <div><Label>Project title (optional)</Label><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} /></div>
               <div><Label>Description</Label><Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
               <div><Label>Challenge</Label>
                 <Select value={form.challenge_id} onValueChange={(v) => setForm({ ...form, challenge_id: v })}>
