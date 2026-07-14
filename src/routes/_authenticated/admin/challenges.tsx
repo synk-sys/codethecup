@@ -10,6 +10,8 @@ export const Route = createFileRoute("/_authenticated/admin/challenges")({
   component: ChallengesPage,
 });
 
+const BADGE_COLORS = ["#4285F4", "#EA4335", "#FBBC05", "#34A853"];
+
 const CODE_THE_CUP_CHALLENGES = [
   { name: "Match Predictor AI", description: "Build a tool that predicts match outcomes using historical stats, team form, or fan sentiment. Bonus points for explaining why it predicts what it predicts." },
   { name: "Fan Translator", description: "A real-time translation or phrasebook app so fans from different countries can chat, order food, or trash-talk rival teams at the stadium." },
@@ -49,14 +51,23 @@ function ChallengesPage() {
   return (
     <div className="space-y-6 max-w-3xl">
       <h1 className="text-3xl font-black">Challenges</h1>
-      <div className="space-y-2">
-        {q.data.challenges.map((c) => (
-          <Card key={c.id} className="p-4 glass flex items-center justify-between">
-            <div><div className="font-bold">{c.name}</div><div className="text-xs text-muted-foreground">{c.sponsor} • {c.description}</div></div>
+      <Card className="glass divide-y divide-border">
+        {q.data.challenges.map((c, i) => (
+          <div key={c.id} className="p-4 flex items-start gap-4">
+            <span
+              className="grid h-7 w-7 shrink-0 place-items-center rounded-full text-sm font-bold text-white"
+              style={{ backgroundColor: BADGE_COLORS[i % BADGE_COLORS.length] }}
+            >
+              {i + 1}
+            </span>
+            <div className="flex-1 min-w-0">
+              <div className="font-bold">{c.name}</div>
+              <div className="text-sm text-muted-foreground mt-0.5">{c.sponsor && `${c.sponsor} • `}{c.description}</div>
+            </div>
             <Button size="sm" variant="ghost" onClick={() => del(c.id)}><Trash2 className="h-4 w-4" /></Button>
-          </Card>
+          </div>
         ))}
-      </div>
+      </Card>
     </div>
   );
 }
