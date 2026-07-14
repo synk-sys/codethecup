@@ -156,12 +156,6 @@ function AuthPage() {
 
               <TabsContent value="admin" className="mt-6 space-y-4">
                 <form onSubmit={passwordAuth} className="space-y-4">
-                  {isSignUp && (
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Display name</Label>
-                      <Input id="name" value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="Your name" />
-                    </div>
-                  )}
                   <div className="space-y-2">
                     <Label htmlFor="email-a">Email</Label>
                     <Input id="email-a" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
@@ -171,12 +165,9 @@ function AuthPage() {
                     <Input id="password" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
                   </div>
                   <Button type="submit" disabled={loading} className="w-full h-11 font-semibold">
-                    {loading ? "..." : isSignUp ? "Create admin account" : "Sign in"}
+                    {loading ? "..." : "Sign in"}
                   </Button>
                 </form>
-                <button type="button" onClick={() => setIsSignUp((v) => !v)} className="text-xs text-muted-foreground hover:text-foreground w-full text-center">
-                  {isSignUp ? "Already have an account? Sign in" : "First admin? Create an account"}
-                </button>
               </TabsContent>
             </Tabs>
           </Card>
