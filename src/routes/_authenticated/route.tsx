@@ -43,9 +43,9 @@ function AuthedLayout() {
             </Link>
             <nav className="flex items-center gap-1 text-sm min-w-0 overflow-x-auto no-scrollbar">
               <NavLink to="/vote" label="Vote" />
-              <NavLink to="/results" label="Results" />
               {admin && (
                 <>
+                  <NavLink to="/results" label="Results" />
                   <span className="mx-2 h-4 w-px bg-border" />
                   <NavLink to="/admin" label="Admin" icon={<LayoutDashboard className="h-3.5 w-3.5" />} />
                   <NavLink to="/admin/settings" label="Settings" icon={<Settings className="h-3.5 w-3.5" />} />
