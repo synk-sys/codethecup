@@ -62,7 +62,7 @@ function VoteDashboard() {
     if (search) {
       const needle = search.toLowerCase();
       const t = teamById.get(p.team_id);
-      if (!p.title.toLowerCase().includes(needle) && !(t?.name.toLowerCase().includes(needle))) return false;
+      if (!(p.title ?? "").toLowerCase().includes(needle) && !(t?.name.toLowerCase().includes(needle))) return false;
     }
     return true;
   });

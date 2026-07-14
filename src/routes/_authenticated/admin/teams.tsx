@@ -93,13 +93,13 @@ function TeamsPage() {
     });
   }
 
-  async function saveEdit(teamId: string, existingProject: any, teamName: string) {
+  async function saveEdit(teamId: string, existingProject: any) {
     if (!q.data) return;
     const hasProjectData = editForm.title.trim() || editForm.description.trim() || editForm.challenge_id
       || editForm.demo_url.trim() || editForm.github_url.trim() || editForm.table_number.trim();
     if (existingProject) {
       const { error } = await supabase.from("projects").update({
-        title: editForm.title.trim() || teamName, description: editForm.description,
+        title: editForm.title.trim() || null, description: editForm.description,
         challenge_id: editForm.challenge_id || null,
         demo_url: editForm.demo_url || null, github_url: editForm.github_url || null,
         table_number: editForm.table_number || null,
@@ -107,7 +107,7 @@ function TeamsPage() {
       if (error) return toast.error(error.message);
     } else if (hasProjectData) {
       const { error } = await supabase.from("projects").insert({
-        event_id: q.data.event.id, team_id: teamId, title: editForm.title.trim() || teamName,
+        event_id: q.data.event.id, team_id: teamId, title: editForm.title.trim() || null,
         description: editForm.description, challenge_id: editForm.challenge_id || null,
         demo_url: editForm.demo_url || null, github_url: editForm.github_url || null,
         table_number: editForm.table_number || null,
@@ -224,7 +224,7 @@ function TeamsPage() {
             <div><Label>Number of members</Label><Input type="number" min={1} value={editForm.table_number} onChange={(e) => setEditForm({ ...editForm, table_number: e.target.value })} /></div>
             <div><Label>Participant emails (comma or newline)</Label><Textarea value={editForm.emails} onChange={(e) => setEditForm({ ...editForm, emails: e.target.value })} rows={3} /></div>
             <Button
-              onClick={() => editingId && saveEdit(editingId, projectByTeam.get(editingId), q.data.teams.find((t) => t.id === editingId)?.name ?? "")}
+              onClick={() => editingId && saveEdit(editingId, projectByTeam.get(editingId))}
               className="w-full"
             >
               Save
