@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { useState } from "react";
-import { Plus, Trash2, Sparkles } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/challenges")({
   component: ChallengesPage,
@@ -39,7 +39,17 @@ function ChallengesPage() {
     queryFn: async () => {
       const event = await fetchActiveEvent();
       if (!event) return null;
-      const { data } = await supabase.from("challenges").select("*").eq("event_id", event.id).order("sort_order");
+      let { data } = await supabase.from("challenges").select("*").eq("event_id", event.id).order("sort_order");
+      if (!data || data.length === 0) {
+        const rows = CODE_THE_CUP_CHALLENGES.map((c, i) => ({
+          ...c,
+          event_id: event.id,
+          color: GOOGLE_COLORS[i % GOOGLE_COLORS.length].value,
+          sort_order: i,
+        }));
+        await supabase.from("challenges").insert(rows);
+        ({ data } = await supabase.from("challenges").select("*").eq("event_id", event.id).order("sort_order"));
+      }
       return { event, challenges: data ?? [] };
     },
   });
@@ -56,29 +66,10 @@ function ChallengesPage() {
     await supabase.from("challenges").delete().eq("id", id);
     qc.invalidateQueries({ queryKey: ["admin-challenges"] });
   }
-  async function loadCodeTheCupPack() {
-    if (!q.data) return;
-    const rows = CODE_THE_CUP_CHALLENGES.map((c, i) => ({
-      ...c,
-      event_id: q.data!.event.id,
-      color: GOOGLE_COLORS[i % GOOGLE_COLORS.length].value,
-      sort_order: i,
-    }));
-    const { error } = await supabase.from("challenges").insert(rows);
-    if (error) return toast.error(error.message);
-    toast.success("Loaded Code the Cup challenges");
-    qc.invalidateQueries({ queryKey: ["admin-challenges"] });
-  }
-
   if (!q.data) return <div>Loading...</div>;
   return (
     <div className="space-y-6 max-w-3xl">
-      <div className="flex items-center justify-between gap-3">
-        <h1 className="text-3xl font-black">Challenges</h1>
-        <Button variant="outline" onClick={loadCodeTheCupPack}>
-          <Sparkles className="h-4 w-4 mr-2" /> Load Code the Cup pack
-        </Button>
-      </div>
+      <h1 className="text-3xl font-black">Challenges</h1>
       <Card className="p-5 glass space-y-3">
         <Input placeholder="Challenge name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
         <Input placeholder="Sponsor (optional)" value={form.sponsor} onChange={(e) => setForm({ ...form, sponsor: e.target.value })} />
