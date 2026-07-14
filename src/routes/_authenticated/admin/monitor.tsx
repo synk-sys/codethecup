@@ -36,6 +36,12 @@ function MonitorPage() {
   const totalExpected = teams.length * Math.max(0, projects.length - 1);
   const totalSubmitted = ballots.filter((b) => b.status === "submitted").length;
 
+  const projectByTeam = new Map(projects.map((p) => [p.team_id, p]));
+  const submittedByTeam = new Map<string, number>();
+  for (const b of ballots.filter((x) => x.status === "submitted" && x.voter_team_id)) {
+    submittedByTeam.set(b.voter_team_id!, (submittedByTeam.get(b.voter_team_id!) ?? 0) + 1);
+  }
+
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
       <h1 className="text-3xl font-black">Voting monitor</h1>
@@ -45,6 +51,21 @@ function MonitorPage() {
           <span className="tabular-nums">{totalSubmitted} / {totalExpected} ballots</span>
         </div>
         <Progress value={totalExpected ? (totalSubmitted / totalExpected) * 100 : 0} className="mt-3 h-3" />
+      </Card>
+      <Card className="p-5 glass">
+        <h2 className="font-bold mb-3">Team vote counts</h2>
+        <div className="space-y-2">
+          {teams.map((t) => {
+            const n = submittedByTeam.get(t.id) ?? 0;
+            const expected = Math.max(0, projects.length - (projectByTeam.has(t.id) ? 1 : 0));
+            return (
+              <div key={t.id} className="flex items-center justify-between text-sm border-b border-border/40 pb-2 last:border-0">
+                <div className="min-w-0 truncate font-medium">{t.name}</div>
+                <Badge variant={expected && n >= expected ? "default" : "secondary"} className="tabular-nums shrink-0">{n} / {expected} votes</Badge>
+              </div>
+            );
+          })}
+        </div>
       </Card>
       <Card className="p-5 glass">
         <h2 className="font-bold mb-3">Project vote counts</h2>
