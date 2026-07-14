@@ -133,7 +133,7 @@ function VotePage() {
   return (
     <div className="container mx-auto px-4 sm:px-6 py-6 max-w-4xl">
       <Link to="/vote" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6">
-        <ArrowLeft className="h-4 w-4" /> Back to projects
+        <ArrowLeft className="h-4 w-4" /> Back to teams
       </Link>
 
       <Card className="p-6 glass mb-6">
