@@ -51,7 +51,7 @@ function SettingsPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-3xl">
+    <div className="space-y-6 max-w-3xl mx-auto">
       <div>
         <h1 className="text-3xl font-black">Event settings</h1>
         <p className="text-muted-foreground">Configure the hackathon and voting behavior.</p>

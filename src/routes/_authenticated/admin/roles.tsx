@@ -47,7 +47,7 @@ function RolesPage() {
   const admins = q.data ?? [];
 
   return (
-    <div className="space-y-6 max-w-2xl">
+    <div className="space-y-6 max-w-2xl mx-auto">
       <div>
         <h1 className="text-3xl font-black">Admins</h1>
         <p className="text-muted-foreground">Manage who has admin access to this event.</p>

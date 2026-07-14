@@ -55,7 +55,7 @@ function CriteriaPage() {
   if (!q.data) return <div>Loading...</div>;
 
   return (
-    <div className="space-y-4 max-w-4xl">
+    <div className="space-y-4 max-w-4xl mx-auto">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-black">Judging criteria</h1>
         <Badge variant={Math.round(total) === 100 ? "default" : "destructive"} className="text-sm">Total: {total}%</Badge>

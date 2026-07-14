@@ -42,7 +42,7 @@ function ChallengesPage() {
   });
   if (!q.data) return <div>Loading...</div>;
   return (
-    <div className="space-y-6 max-w-3xl">
+    <div className="space-y-6 max-w-3xl mx-auto">
       <h1 className="text-3xl font-black">Challenges</h1>
       <Card className="glass divide-y divide-border">
         {q.data.challenges.map((c, i) => (

@@ -84,7 +84,7 @@ function TeamsPage() {
   const challengeById = new Map(q.data.challenges.map((c) => [c.id, c]));
 
   return (
-    <div className="space-y-4 max-w-5xl">
+    <div className="space-y-4 max-w-5xl mx-auto">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-black">Teams</h1>
         <Dialog open={open} onOpenChange={setOpen}>

@@ -37,7 +37,7 @@ function MonitorPage() {
   const totalSubmitted = ballots.filter((b) => b.status === "submitted").length;
 
   return (
-    <div className="space-y-6 max-w-5xl">
+    <div className="space-y-6 max-w-5xl mx-auto">
       <h1 className="text-3xl font-black">Voting monitor</h1>
       <Card className="p-5 glass">
         <div className="flex items-center justify-between text-sm font-medium">
