@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { useState } from "react";
-import { Plus, Trash2, Users, Pencil } from "lucide-react";
+import { Plus, Trash2, Users, Pencil, Trophy } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/teams")({
   component: TeamsPage,
@@ -122,6 +122,8 @@ function TeamsPage() {
     qc.invalidateQueries({ queryKey: ["admin-teams"] });
   }
 
+  const [viewingId, setViewingId] = useState<string | null>(null);
+
   if (!q.data) return <div>Loading...</div>;
   const membersByTeam = new Map<string, any[]>();
   for (const m of q.data.members) {
@@ -166,7 +168,7 @@ function TeamsPage() {
           const members = membersByTeam.get(t.id) ?? [];
           const ch = p?.challenge_id ? challengeById.get(p.challenge_id) : null;
           return (
-            <Card key={t.id} className="p-5 glass">
+            <Card key={t.id} className="p-5 glass cursor-pointer hover:border-primary/60 transition" onClick={() => setViewingId(t.id)}>
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2"><Users className="h-4 w-4 text-primary" /><h3 className="font-bold">{t.name}</h3></div>
@@ -178,7 +180,7 @@ function TeamsPage() {
                   </div>
                   {members.length > 0 && <div className="mt-2 text-xs text-muted-foreground">{members.map((m) => m.email).join(", ")}</div>}
                 </div>
-                <div className="flex gap-1">
+                <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
                   <Button variant="ghost" size="icon" onClick={() => openEdit(t.id, p, members)}><Pencil className="h-4 w-4" /></Button>
                   <Button variant="ghost" size="icon" onClick={() => delTeam(t.id)}><Trash2 className="h-4 w-4" /></Button>
                 </div>
@@ -207,6 +209,60 @@ function TeamsPage() {
             <div><Label>Participant emails (comma or newline)</Label><Textarea value={editForm.emails} onChange={(e) => setEditForm({ ...editForm, emails: e.target.value })} rows={3} /></div>
             <Button onClick={() => editingId && saveEdit(editingId, projectByTeam.get(editingId))} className="w-full">Save</Button>
           </div>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={!!viewingId} onOpenChange={(v) => !v && setViewingId(null)}>
+        <DialogContent className="max-w-md p-0 overflow-hidden border-0 bg-transparent shadow-none">
+          {(() => {
+            const t = q.data.teams.find((t) => t.id === viewingId);
+            if (!t) return null;
+            const p = projectByTeam.get(t.id);
+            const members = membersByTeam.get(t.id) ?? [];
+            const ch = p?.challenge_id ? challengeById.get(p.challenge_id) : null;
+            return (
+              <div
+                className="relative rounded-2xl p-8 text-center text-white overflow-hidden"
+                style={{
+                  background: "linear-gradient(160deg, #006633 0%, #0a8a44 55%, #146c36 100%)",
+                  boxShadow: "0 0 0 4px #ffcc00, 0 20px 60px rgba(0,0,0,0.4)",
+                }}
+              >
+                <div
+                  className="absolute inset-0 opacity-10 pointer-events-none"
+                  style={{
+                    backgroundImage:
+                      "repeating-linear-gradient(45deg, #fff 0, #fff 2px, transparent 2px, transparent 14px)",
+                  }}
+                />
+                <div className="relative">
+                  <Trophy className="h-10 w-10 mx-auto mb-3 text-yellow-300 drop-shadow" />
+                  <div className="text-xs tracking-[0.3em] uppercase text-yellow-200 font-semibold mb-1">Code the Cup</div>
+                  <h2 className="text-3xl font-black uppercase tracking-wide drop-shadow-sm mb-3">{t.name}</h2>
+                  {ch && (
+                    <div className="inline-block mb-4 px-4 py-1 rounded-full bg-white/15 backdrop-blur text-sm font-semibold border border-white/30">
+                      {ch.name}
+                    </div>
+                  )}
+                  {p?.title && <div className="text-lg font-bold mb-4">{p.title}</div>}
+                  <div className="mt-2 rounded-xl bg-black/20 backdrop-blur p-4 text-left">
+                    <div className="text-xs uppercase tracking-widest text-yellow-200 font-semibold mb-2 text-center">Squad</div>
+                    {members.length > 0 ? (
+                      <ul className="space-y-1.5">
+                        {members.map((m, i) => (
+                          <li key={m.id} className="flex items-center gap-3 text-sm">
+                            <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-yellow-300 text-[#006633] font-black text-xs">{i + 1}</span>
+                            <span className="font-medium">{m.name || m.email}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <div className="text-sm text-white/70 text-center">No members added yet</div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
         </DialogContent>
       </Dialog>
     </div>
