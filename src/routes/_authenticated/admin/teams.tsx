@@ -90,7 +90,7 @@ function TeamsPage() {
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild><Button><Plus className="h-4 w-4 mr-2" /> Add team</Button></DialogTrigger>
           <DialogContent className="max-w-lg">
-            <DialogHeader><DialogTitle>New team & project</DialogTitle></DialogHeader>
+            <DialogHeader><DialogTitle>New team</DialogTitle></DialogHeader>
             <div className="space-y-3">
               <div><Label>Team / individual name</Label><Input value={form.teamName} onChange={(e) => setForm({ ...form, teamName: e.target.value })} /></div>
               <div><Label>Project title (optional)</Label><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} /></div>
