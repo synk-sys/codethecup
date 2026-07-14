@@ -153,7 +153,7 @@ function TeamsPage() {
                 <div><Label>Demo URL</Label><Input value={form.demo_url} onChange={(e) => setForm({ ...form, demo_url: e.target.value })} /></div>
                 <div><Label>GitHub</Label><Input value={form.github_url} onChange={(e) => setForm({ ...form, github_url: e.target.value })} /></div>
               </div>
-              <div><Label>Table number</Label><Input value={form.table_number} onChange={(e) => setForm({ ...form, table_number: e.target.value })} /></div>
+              <div><Label>Number of members</Label><Input type="number" min={1} value={form.table_number} onChange={(e) => setForm({ ...form, table_number: e.target.value })} /></div>
               <div><Label>Participant emails (comma or newline)</Label><Textarea value={form.emails} onChange={(e) => setForm({ ...form, emails: e.target.value })} rows={3} /></div>
               <Button onClick={create} className="w-full">Create</Button>
             </div>
@@ -173,7 +173,7 @@ function TeamsPage() {
                   {p && <div className="mt-1"><div className="font-semibold">{p.title}</div><div className="text-sm text-muted-foreground">{p.description}</div></div>}
                   <div className="mt-2 flex flex-wrap gap-2 text-xs text-muted-foreground">
                     {ch && <span>Challenge: {ch.name}</span>}
-                    {p?.table_number && <span>Table {p.table_number}</span>}
+                    {p?.table_number && <span>{p.table_number} member{p.table_number === "1" ? "" : "s"}</span>}
                     <span>{members.length} member{members.length === 1 ? "" : "s"}</span>
                   </div>
                   {members.length > 0 && <div className="mt-2 text-xs text-muted-foreground">{members.map((m) => m.email).join(", ")}</div>}
@@ -203,7 +203,7 @@ function TeamsPage() {
               <div><Label>Demo URL</Label><Input value={editForm.demo_url} onChange={(e) => setEditForm({ ...editForm, demo_url: e.target.value })} /></div>
               <div><Label>GitHub</Label><Input value={editForm.github_url} onChange={(e) => setEditForm({ ...editForm, github_url: e.target.value })} /></div>
             </div>
-            <div><Label>Table number</Label><Input value={editForm.table_number} onChange={(e) => setEditForm({ ...editForm, table_number: e.target.value })} /></div>
+            <div><Label>Number of members</Label><Input type="number" min={1} value={editForm.table_number} onChange={(e) => setEditForm({ ...editForm, table_number: e.target.value })} /></div>
             <div><Label>Participant emails (comma or newline)</Label><Textarea value={editForm.emails} onChange={(e) => setEditForm({ ...editForm, emails: e.target.value })} rows={3} /></div>
             <Button onClick={() => editingId && saveEdit(editingId, projectByTeam.get(editingId))} className="w-full">Save</Button>
           </div>
