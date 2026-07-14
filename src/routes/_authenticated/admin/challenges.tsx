@@ -14,13 +14,6 @@ export const Route = createFileRoute("/_authenticated/admin/challenges")({
   component: ChallengesPage,
 });
 
-export const GOOGLE_COLORS = [
-  { name: "Blue", value: "#4285F4" },
-  { name: "Red", value: "#EA4335" },
-  { name: "Yellow", value: "#FBBC05" },
-  { name: "Green", value: "#34A853" },
-];
-
 const CODE_THE_CUP_CHALLENGES = [
   { name: "Match Predictor AI", description: "Build a tool that predicts match outcomes using historical stats, team form, or fan sentiment. Bonus points for explaining why it predicts what it predicts." },
   { name: "Fan Translator", description: "A real-time translation or phrasebook app so fans from different countries can chat, order food, or trash-talk rival teams at the stadium." },
@@ -44,7 +37,6 @@ function ChallengesPage() {
         const rows = CODE_THE_CUP_CHALLENGES.map((c, i) => ({
           ...c,
           event_id: event.id,
-          color: GOOGLE_COLORS[i % GOOGLE_COLORS.length].value,
           sort_order: i,
         }));
         await supabase.from("challenges").insert(rows);
@@ -53,13 +45,13 @@ function ChallengesPage() {
       return { event, challenges: data ?? [] };
     },
   });
-  const [form, setForm] = useState({ name: "", description: "", sponsor: "", color: GOOGLE_COLORS[0].value });
+  const [form, setForm] = useState({ name: "", description: "", sponsor: "" });
 
   async function add() {
     if (!q.data || !form.name.trim()) return;
     const { error } = await supabase.from("challenges").insert({ ...form, event_id: q.data.event.id });
     if (error) return toast.error(error.message);
-    setForm({ name: "", description: "", sponsor: "", color: GOOGLE_COLORS[0].value });
+    setForm({ name: "", description: "", sponsor: "" });
     qc.invalidateQueries({ queryKey: ["admin-challenges"] });
   }
   async function del(id: string) {
@@ -74,27 +66,12 @@ function ChallengesPage() {
         <Input placeholder="Challenge name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
         <Input placeholder="Sponsor (optional)" value={form.sponsor} onChange={(e) => setForm({ ...form, sponsor: e.target.value })} />
         <Textarea placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
-        <div className="flex items-center gap-2">
-          {GOOGLE_COLORS.map((c) => (
-            <button
-              key={c.value}
-              type="button"
-              title={c.name}
-              onClick={() => setForm({ ...form, color: c.value })}
-              className="h-7 w-7 rounded-full transition ring-offset-2 ring-offset-background"
-              style={{ backgroundColor: c.value, boxShadow: form.color === c.value ? `0 0 0 2px ${c.value}` : undefined }}
-            />
-          ))}
-        </div>
         <Button onClick={add}><Plus className="h-4 w-4 mr-2" /> Add challenge</Button>
       </Card>
       <div className="space-y-2">
         {q.data.challenges.map((c) => (
           <Card key={c.id} className="p-4 glass flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="h-3 w-3 rounded-full shrink-0" style={{ backgroundColor: c.color ?? "var(--muted-foreground)" }} />
-              <div><div className="font-bold">{c.name}</div><div className="text-xs text-muted-foreground">{c.sponsor} • {c.description}</div></div>
-            </div>
+            <div><div className="font-bold">{c.name}</div><div className="text-xs text-muted-foreground">{c.sponsor} • {c.description}</div></div>
             <Button size="sm" variant="ghost" onClick={() => del(c.id)}><Trash2 className="h-4 w-4" /></Button>
           </Card>
         ))}

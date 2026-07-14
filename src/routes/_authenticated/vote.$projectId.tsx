@@ -141,7 +141,6 @@ function VotePage() {
           <div className="min-w-0 flex-1">
             {challenge && (
               <Badge variant="outline" className="mb-2 gap-1.5">
-                <span className="h-2 w-2 rounded-full" style={{ backgroundColor: challenge.color ?? undefined }} />
                 {challenge.name}
               </Badge>
             )}

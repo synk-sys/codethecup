@@ -140,7 +140,6 @@ function VoteDashboard() {
                       <StatusBadge status={status} />
                       {ch && (
                         <Badge variant="outline" className="text-[10px] gap-1.5">
-                          <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: ch.color ?? undefined }} />
                           {ch.name}
                         </Badge>
                       )}
