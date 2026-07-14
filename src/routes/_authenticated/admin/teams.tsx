@@ -84,7 +84,7 @@ function TeamsPage() {
   return (
     <div className="space-y-4 max-w-5xl">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-black">Teams & projects</h1>
+        <h1 className="text-3xl font-black">Teams</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild><Button><Plus className="h-4 w-4 mr-2" /> Add team</Button></DialogTrigger>
           <DialogContent className="max-w-lg">

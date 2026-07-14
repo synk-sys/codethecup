@@ -18,7 +18,7 @@ const NAV: { to: string; label: string; icon: any; exact?: boolean }[] = [
   { to: "/admin/settings", label: "Event", icon: Settings },
   { to: "/admin/challenges", label: "Challenges", icon: Award },
   { to: "/admin/criteria", label: "Criteria", icon: ListChecks },
-  { to: "/admin/teams", label: "Teams & Projects", icon: Users },
+  { to: "/admin/teams", label: "Teams", icon: Users },
   { to: "/admin/monitor", label: "Monitor", icon: Activity },
   { to: "/admin/results", label: "Results", icon: Trophy },
   { to: "/admin/roles", label: "Admins", icon: ShieldCheck },
