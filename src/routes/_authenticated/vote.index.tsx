@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, ArrowRight, Ban, CheckCircle2, Clock, Circle, MapPin } from "lucide-react";
+import { Search, ArrowRight, Ban, CheckCircle2, Clock, Circle } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
 
@@ -147,10 +147,7 @@ function VoteDashboard() {
                     <h3 className="text-lg font-bold leading-tight line-clamp-2">{p.title}</h3>
                     <p className="text-sm text-muted-foreground mt-1">{team?.name}</p>
                     {p.description && <p className="text-sm text-muted-foreground/80 mt-3 line-clamp-3">{p.description}</p>}
-                    <div className="mt-4 pt-4 border-t border-border/60 flex items-center justify-between text-xs text-muted-foreground">
-                      {p.table_number ? (
-                        <span className="inline-flex items-center gap-1"><MapPin className="h-3 w-3" /> Table {p.table_number}</span>
-                      ) : <span />}
+                    <div className="mt-4 pt-4 border-t border-border/60 flex items-center justify-end text-xs text-muted-foreground">
                       <span className="inline-flex items-center gap-1 font-semibold text-primary group-hover:gap-2 transition-all">
                         {status === "submitted" ? "View" : "Vote"} <ArrowRight className="h-3 w-3" />
                       </span>

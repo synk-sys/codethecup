@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, ExternalLink, Github, MapPin, Save, Send, Sparkles, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ExternalLink, Github, Save, Send, Sparkles, CheckCircle2 } from "lucide-react";
 import confetti from "canvas-confetti";
 
 export const Route = createFileRoute("/_authenticated/vote/$projectId")({
@@ -155,7 +155,6 @@ function VotePage() {
         <div className="mt-4 flex flex-wrap gap-4 text-sm">
           {project.demo_url && <a href={project.demo_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline"><ExternalLink className="h-3.5 w-3.5" /> Demo</a>}
           {project.github_url && <a href={project.github_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline"><Github className="h-3.5 w-3.5" /> Code</a>}
-          {project.table_number && <span className="inline-flex items-center gap-1 text-muted-foreground"><MapPin className="h-3.5 w-3.5" /> Table {project.table_number}</span>}
         </div>
         {members.length > 0 && (
           <div className="mt-4 pt-4 border-t border-border/60">
