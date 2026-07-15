@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
-import { ArrowLeft, ExternalLink, Github, Send, Sparkles, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ExternalLink, Github, Send, CheckCircle2 } from "lucide-react";
 import confetti from "canvas-confetti";
 
 const GOOGLE_COLORS = ["#4285F4", "#EA4335", "#FBBC05", "#34A853"];
@@ -154,8 +154,6 @@ function VotePage() {
         )}
       </Card>
 
-      <RubricCard criteria={bundle.criteria} scaleMin={settings?.score_scale_min ?? 1} scaleMax={settings?.score_scale_max ?? 10} />
-
       <div className="mt-6 space-y-4">
         {bundle.criteria.map((c, idx) => (
           <CriterionCard
@@ -208,31 +206,6 @@ function VotePage() {
         )}
       </AnimatePresence>
     </div>
-  );
-}
-
-function RubricCard({ criteria, scaleMin, scaleMax }: { criteria: Criterion[]; scaleMin: number; scaleMax: number }) {
-  const total = criteria.reduce((s, c) => s + Number(c.weight), 0);
-  return (
-    <Card className="p-5 glass">
-      <div className="flex items-center gap-2 mb-3">
-        <Sparkles className="h-4 w-4 text-primary" />
-        <h2 className="font-bold">Judging rubric</h2>
-        <Badge variant="outline" className="ml-auto text-xs">Scale {scaleMin}–{scaleMax}</Badge>
-      </div>
-      <div className="grid gap-2 sm:grid-cols-2">
-        {criteria.map((c) => (
-          <div key={c.id} className="flex items-start justify-between gap-3 text-sm">
-            <div>
-              <div className="font-medium">{c.name}</div>
-              {c.description && <div className="text-xs text-muted-foreground line-clamp-2">{c.description}</div>}
-            </div>
-            <Badge variant="secondary" className="shrink-0 tabular-nums">{Number(c.weight)}%</Badge>
-          </div>
-        ))}
-      </div>
-      <p className="mt-3 text-xs text-muted-foreground">Final score = Σ (normalized score × weight ÷ {total}%), reported out of 100.</p>
-    </Card>
   );
 }
 
