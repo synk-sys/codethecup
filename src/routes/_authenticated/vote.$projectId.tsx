@@ -10,7 +10,6 @@ import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import { ArrowLeft, ExternalLink, Github, Send, CheckCircle2 } from "lucide-react";
-import confetti from "canvas-confetti";
 
 const GOOGLE_COLORS = ["#4285F4", "#EA4335", "#FBBC05", "#34A853"];
 
@@ -108,7 +107,6 @@ function VotePage() {
       qc.invalidateQueries();
       if (status === "submitted") {
         setShowSuccess(true);
-        confetti({ particleCount: 120, spread: 90, origin: { y: 0.6 }, colors: ["#4285F4", "#EA4335", "#FBBC05", "#34A853"] });
         setTimeout(() => navigate({ to: "/vote" }), 1800);
       } else {
         toast.success("Draft saved");
