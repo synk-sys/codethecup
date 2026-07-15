@@ -192,7 +192,7 @@ function TeamsPage() {
               <div><Label>Team / individual name</Label><Input value={form.teamName} onChange={(e) => setForm({ ...form, teamName: e.target.value })} /></div>
               <label className="flex items-center gap-2 text-sm">
                 <input type="checkbox" checked={form.noProject} onChange={(e) => setForm({ ...form, noProject: e.target.checked })} />
-                Non-competing team (mentors/organizers) — no project, hidden from voting
+                Non-competing team (mentors/organizers) — hidden from voting
               </label>
               {!form.noProject && (
                 <>
@@ -263,7 +263,7 @@ function TeamsPage() {
           <div className="space-y-3">
             <label className="flex items-center gap-2 text-sm">
               <input type="checkbox" checked={editForm.noProject} onChange={(e) => setEditForm({ ...editForm, noProject: e.target.checked })} />
-              Non-competing team (mentors/organizers) — no project, hidden from voting
+              Non-competing team (mentors/organizers) — hidden from voting
             </label>
             {!editForm.noProject && (
               <>

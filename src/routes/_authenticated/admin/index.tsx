@@ -20,7 +20,7 @@ function AdminDash() {
       const event = await fetchActiveEvent();
       if (!event) return null;
       const [{ count: teamsCount }, { data: ballots }, { count: challengesCount }] = await Promise.all([
-        supabase.from("teams").select("id", { count: "exact", head: true }).eq("event_id", event.id),
+        supabase.from("projects").select("id", { count: "exact", head: true }).eq("event_id", event.id),
         supabase.from("ballots").select("id, status").eq("event_id", event.id),
         supabase.from("challenges").select("id", { count: "exact", head: true }).eq("event_id", event.id),
       ]);
