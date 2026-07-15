@@ -21,7 +21,7 @@ const NAV: { to: string; label: string; icon: any; exact?: boolean }[] = [
   { to: "/admin/teams", label: "Teams", icon: Users },
   { to: "/admin/monitor", label: "Monitor", icon: Activity },
   { to: "/admin/results", label: "Results", icon: Trophy },
-  { to: "/admin/roles", label: "Admins", icon: ShieldCheck },
+  { to: "/admin/roles", label: "Account", icon: ShieldCheck },
 ];
 
 function AdminLayout() {

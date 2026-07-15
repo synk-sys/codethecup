@@ -1,95 +1,68 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useState } from "react";
-import { ShieldCheck, UserMinus } from "lucide-react";
+import { KeyRound, UserCircle } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/roles")({
-  component: RolesPage,
+  component: AccountPage,
 });
 
-function RolesPage() {
-  const qc = useQueryClient();
-  const [email, setEmail] = useState("");
+function AccountPage() {
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [saving, setSaving] = useState(false);
 
   const q = useQuery({
-    queryKey: ["admin-roles"],
+    queryKey: ["admin-account"],
     queryFn: async () => {
-      const { data: roles, error } = await supabase.from("user_roles").select("user_id").eq("role", "admin");
-      if (error) throw error;
-      const ids = (roles ?? []).map((r) => r.user_id);
-      if (ids.length === 0) return [];
-      const { data: profiles } = await supabase.from("profiles").select("id, email, display_name").in("id", ids);
-      return profiles ?? [];
+      const { data } = await supabase.auth.getUser();
+      return data.user;
     },
   });
 
-  async function promote() {
-    const trimmed = email.trim();
-    if (!trimmed) return;
-    const { data: profile, error: pErr } = await supabase.from("profiles").select("id").eq("email", trimmed).maybeSingle();
-    if (pErr || !profile) { toast.error("No user found with that email"); return; }
-    const { error } = await supabase.from("user_roles").insert({ user_id: profile.id, role: "admin" });
-    if (error) toast.error(error.message);
-    else { toast.success("Promoted to admin"); setEmail(""); qc.invalidateQueries({ queryKey: ["admin-roles"] }); }
+  async function changePassword() {
+    if (password.length < 6) return toast.error("Password must be at least 6 characters");
+    if (password !== confirm) return toast.error("Passwords don't match");
+    setSaving(true);
+    const { error } = await supabase.auth.updateUser({ password });
+    setSaving(false);
+    if (error) return toast.error(error.message);
+    toast.success("Password updated");
+    setPassword("");
+    setConfirm("");
   }
 
-  async function demote(userId: string) {
-    const { error } = await supabase.from("user_roles").delete().eq("user_id", userId).eq("role", "admin");
-    if (error) toast.error(error.message);
-    else { toast.success("Removed admin"); qc.invalidateQueries({ queryKey: ["admin-roles"] }); }
-  }
-
-  const admins = q.data ?? [];
+  const user = q.data;
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
       <div>
-        <h1 className="text-3xl font-black">Admins</h1>
-        <p className="text-muted-foreground">Manage who has admin access to this event.</p>
+        <h1 className="text-3xl font-black">Account</h1>
+        <p className="text-muted-foreground">Your admin account for this event.</p>
       </div>
 
       <Card className="p-6 glass space-y-3">
-        <h2 className="font-bold">Promote a user</h2>
-        <div className="flex gap-2">
-          <Input placeholder="user@example.com" value={email} onChange={(e) => setEmail(e.target.value)} />
-          <Button onClick={promote}><ShieldCheck className="h-4 w-4 mr-2" /> Make admin</Button>
-        </div>
+        <div className="flex items-center gap-2 font-bold"><UserCircle className="h-4 w-4" /> Signed in as</div>
+        <div className="text-sm text-muted-foreground">{user?.email ?? "..."}</div>
       </Card>
 
       <Card className="p-6 glass space-y-3">
-        <h2 className="font-bold">Current admins</h2>
-        {q.isLoading ? (
-          <div className="text-sm text-muted-foreground">Loading...</div>
-        ) : admins.length === 0 ? (
-          <div className="text-sm text-muted-foreground">No admins found.</div>
-        ) : (
-          <div className="space-y-2">
-            {admins.map((a) => (
-              <div key={a.id} className="flex items-center justify-between gap-4 rounded-lg border border-border/60 p-3">
-                <div>
-                  <div className="font-medium text-sm">{a.display_name || a.email}</div>
-                  <div className="text-xs text-muted-foreground">{a.email}</div>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={admins.length === 1}
-                  onClick={() => demote(a.id)}
-                >
-                  <UserMinus className="h-4 w-4 mr-2" /> Remove admin
-                </Button>
-              </div>
-            ))}
-          </div>
-        )}
-        {admins.length === 1 && (
-          <p className="text-xs text-muted-foreground">Can't remove the only admin — promote someone else first.</p>
-        )}
+        <div className="flex items-center gap-2 font-bold"><KeyRound className="h-4 w-4" /> Change password</div>
+        <div className="space-y-2">
+          <Label htmlFor="new-password">New password</Label>
+          <Input id="new-password" type="password" minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="confirm-password">Confirm password</Label>
+          <Input id="confirm-password" type="password" minLength={6} value={confirm} onChange={(e) => setConfirm(e.target.value)} />
+        </div>
+        <Button onClick={changePassword} disabled={saving}>{saving ? "Saving..." : "Update password"}</Button>
       </Card>
     </div>
   );
