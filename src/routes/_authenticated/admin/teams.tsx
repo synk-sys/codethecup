@@ -103,17 +103,15 @@ function TeamsPage() {
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({
-    description: "", challenge_id: "",
-    demo_url: "", github_url: "", table_number: "", names: "", noProject: false,
+    challenge_id: "",
+    demo_url: "", table_number: "", names: "", noProject: false,
   });
 
   function openEdit(teamId: string, project: any, members: any[]) {
     setEditingId(teamId);
     setEditForm({
-      description: project?.description ?? "",
       challenge_id: project?.challenge_id ?? "",
       demo_url: project?.demo_url ?? "",
-      github_url: project?.github_url ?? "",
       table_number: project?.table_number ?? "",
       names: members.map((m) => m.name).filter(Boolean).join(", "),
       noProject: !project,
@@ -128,17 +126,16 @@ function TeamsPage() {
       }
     } else if (existingProject) {
       const { error } = await supabase.from("projects").update({
-        description: editForm.description,
         challenge_id: editForm.challenge_id || null,
-        demo_url: editForm.demo_url || null, github_url: editForm.github_url || null,
+        demo_url: editForm.demo_url || null,
         table_number: editForm.table_number || null,
       }).eq("id", existingProject.id);
       if (error) return toast.error(error.message);
     } else {
       const { error } = await supabase.from("projects").insert({
         event_id: q.data.event.id, team_id: teamId,
-        description: editForm.description, challenge_id: editForm.challenge_id || null,
-        demo_url: editForm.demo_url || null, github_url: editForm.github_url || null,
+        challenge_id: editForm.challenge_id || null,
+        demo_url: editForm.demo_url || null,
         table_number: editForm.table_number || null,
       });
       if (error) return toast.error(error.message);
@@ -194,7 +191,7 @@ function TeamsPage() {
               <div><Label>Team / individual name</Label><Input value={form.teamName} onChange={(e) => setForm({ ...form, teamName: e.target.value })} /></div>
               <label className="flex items-center gap-2 text-sm">
                 <input type="checkbox" checked={form.noProject} onChange={(e) => setForm({ ...form, noProject: e.target.checked })} />
-                Non-competing team (mentors/organizers) — hidden from voting
+                Non-competing team (mentors/organizers)
               </label>
               {!form.noProject && (
                 <>
@@ -260,21 +257,17 @@ function TeamsPage() {
           <div className="space-y-3">
             <label className="flex items-center gap-2 text-sm">
               <input type="checkbox" checked={editForm.noProject} onChange={(e) => setEditForm({ ...editForm, noProject: e.target.checked })} />
-              Non-competing team (mentors/organizers) — hidden from voting
+              Non-competing team (mentors/organizers)
             </label>
             {!editForm.noProject && (
               <>
-                <div><Label>Description</Label><Textarea value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} /></div>
                 <div><Label>Challenge</Label>
                   <Select value={editForm.challenge_id} onValueChange={(v) => setEditForm({ ...editForm, challenge_id: v })}>
                     <SelectTrigger><SelectValue placeholder="None" /></SelectTrigger>
                     <SelectContent>{q.data.challenges.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent>
                   </Select>
                 </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div><Label>Demo URL</Label><Input value={editForm.demo_url} onChange={(e) => setEditForm({ ...editForm, demo_url: e.target.value })} /></div>
-                  <div><Label>GitHub</Label><Input value={editForm.github_url} onChange={(e) => setEditForm({ ...editForm, github_url: e.target.value })} /></div>
-                </div>
+                <div><Label>Demo URL</Label><Input value={editForm.demo_url} onChange={(e) => setEditForm({ ...editForm, demo_url: e.target.value })} /></div>
                 <div><Label>Number of members</Label><Input type="number" min={1} value={editForm.table_number} onChange={(e) => setEditForm({ ...editForm, table_number: e.target.value })} /></div>
               </>
             )}
