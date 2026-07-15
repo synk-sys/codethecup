@@ -271,7 +271,6 @@ function CriterionCard({
           <div className="min-w-0">
             <div className="flex items-center gap-2">
               <h3 className="text-lg font-bold" style={{ color: GOOGLE_COLORS[(index - 1) % GOOGLE_COLORS.length] }}>{criterion.name}</h3>
-              <Badge variant="secondary">{Number(criterion.weight)}%</Badge>
             </div>
             {criterion.description && <p className="text-sm text-muted-foreground mt-1">{criterion.description}</p>}
           </div>
