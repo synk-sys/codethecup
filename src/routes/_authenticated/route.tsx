@@ -42,7 +42,7 @@ function AuthedLayout() {
               <span className="gradient-text hidden sm:inline">Code the Cup</span>
             </Link>
             <nav className="flex items-center gap-1 text-sm min-w-0 overflow-x-auto no-scrollbar">
-              <NavLink to="/vote" label="Vote" />
+              {!admin && <NavLink to="/vote" label="Vote" />}
               {admin && (
                 <>
                   <NavLink to="/results" label="Results" />
