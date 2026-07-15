@@ -52,7 +52,7 @@ function TeamsPage() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
     teamName: "", title: "", description: "", challenge_id: "",
-    demo_url: "", github_url: "", table_number: "", names: "",
+    demo_url: "", github_url: "", table_number: "", names: "", noProject: false,
   });
 
   async function create() {
@@ -60,19 +60,21 @@ function TeamsPage() {
     const { data: team, error: e1 } = await supabase.from("teams").insert({ event_id: q.data.event.id, name: form.teamName }).select().single();
     if (e1) return toast.error(e1.message);
     await supabase.from("team_passcodes").insert({ team_id: team.id, passcode: randomPasscode() });
-    const { error: e2 } = await supabase.from("projects").insert({
-      event_id: q.data.event.id, team_id: team.id, title: form.title.trim() || null,
-      description: form.description, challenge_id: form.challenge_id || null,
-      demo_url: form.demo_url || null, github_url: form.github_url || null,
-      table_number: form.table_number || null,
-    });
-    if (e2) return toast.error(e2.message);
+    if (!form.noProject) {
+      const { error: e2 } = await supabase.from("projects").insert({
+        event_id: q.data.event.id, team_id: team.id, title: form.title.trim() || null,
+        description: form.description, challenge_id: form.challenge_id || null,
+        demo_url: form.demo_url || null, github_url: form.github_url || null,
+        table_number: form.table_number || null,
+      });
+      if (e2) return toast.error(e2.message);
+    }
     const names = form.names.split(/[,\n]/).map((n) => n.trim()).filter(Boolean);
     if (names.length) {
       await supabase.from("team_members").insert(names.map((name) => ({ team_id: team.id, name })));
     }
     toast.success("Team created");
-    setForm({ teamName: "", title: "", description: "", challenge_id: "", demo_url: "", github_url: "", table_number: "", names: "" });
+    setForm({ teamName: "", title: "", description: "", challenge_id: "", demo_url: "", github_url: "", table_number: "", names: "", noProject: false });
     setOpen(false);
     qc.invalidateQueries({ queryKey: ["admin-teams"] });
   }
@@ -99,7 +101,7 @@ function TeamsPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({
     title: "", description: "", challenge_id: "",
-    demo_url: "", github_url: "", table_number: "", names: "",
+    demo_url: "", github_url: "", table_number: "", names: "", noProject: false,
   });
 
   function openEdit(teamId: string, project: any, members: any[]) {
@@ -112,14 +114,17 @@ function TeamsPage() {
       github_url: project?.github_url ?? "",
       table_number: project?.table_number ?? "",
       names: members.map((m) => m.name).filter(Boolean).join(", "),
+      noProject: !project,
     });
   }
 
   async function saveEdit(teamId: string, existingProject: any) {
     if (!q.data) return;
-    const hasProjectData = editForm.title.trim() || editForm.description.trim() || editForm.challenge_id
-      || editForm.demo_url.trim() || editForm.github_url.trim() || editForm.table_number.trim();
-    if (existingProject) {
+    if (editForm.noProject) {
+      if (existingProject) {
+        await supabase.from("projects").delete().eq("id", existingProject.id);
+      }
+    } else if (existingProject) {
       const { error } = await supabase.from("projects").update({
         title: editForm.title.trim() || null, description: editForm.description,
         challenge_id: editForm.challenge_id || null,
@@ -127,7 +132,7 @@ function TeamsPage() {
         table_number: editForm.table_number || null,
       }).eq("id", existingProject.id);
       if (error) return toast.error(error.message);
-    } else if (hasProjectData) {
+    } else {
       const { error } = await supabase.from("projects").insert({
         event_id: q.data.event.id, team_id: teamId, title: editForm.title.trim() || null,
         description: editForm.description, challenge_id: editForm.challenge_id || null,
@@ -185,19 +190,27 @@ function TeamsPage() {
             <DialogHeader><DialogTitle>New team</DialogTitle></DialogHeader>
             <div className="space-y-3">
               <div><Label>Team / individual name</Label><Input value={form.teamName} onChange={(e) => setForm({ ...form, teamName: e.target.value })} /></div>
-              <div><Label>Project title (optional)</Label><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} /></div>
-              <div><Label>Description</Label><Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
-              <div><Label>Challenge</Label>
-                <Select value={form.challenge_id} onValueChange={(v) => setForm({ ...form, challenge_id: v })}>
-                  <SelectTrigger><SelectValue placeholder="None" /></SelectTrigger>
-                  <SelectContent>{q.data.challenges.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent>
-                </Select>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <div><Label>Demo URL</Label><Input value={form.demo_url} onChange={(e) => setForm({ ...form, demo_url: e.target.value })} /></div>
-                <div><Label>GitHub</Label><Input value={form.github_url} onChange={(e) => setForm({ ...form, github_url: e.target.value })} /></div>
-              </div>
-              <div><Label>Number of members</Label><Input type="number" min={1} value={form.table_number} onChange={(e) => setForm({ ...form, table_number: e.target.value })} /></div>
+              <label className="flex items-center gap-2 text-sm">
+                <input type="checkbox" checked={form.noProject} onChange={(e) => setForm({ ...form, noProject: e.target.checked })} />
+                Non-competing team (mentors/organizers) — no project, hidden from voting
+              </label>
+              {!form.noProject && (
+                <>
+                  <div><Label>Project title (optional)</Label><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} /></div>
+                  <div><Label>Description</Label><Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
+                  <div><Label>Challenge</Label>
+                    <Select value={form.challenge_id} onValueChange={(v) => setForm({ ...form, challenge_id: v })}>
+                      <SelectTrigger><SelectValue placeholder="None" /></SelectTrigger>
+                      <SelectContent>{q.data.challenges.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div><Label>Demo URL</Label><Input value={form.demo_url} onChange={(e) => setForm({ ...form, demo_url: e.target.value })} /></div>
+                    <div><Label>GitHub</Label><Input value={form.github_url} onChange={(e) => setForm({ ...form, github_url: e.target.value })} /></div>
+                  </div>
+                  <div><Label>Number of members</Label><Input type="number" min={1} value={form.table_number} onChange={(e) => setForm({ ...form, table_number: e.target.value })} /></div>
+                </>
+              )}
               <div><Label>Participant names (comma or newline)</Label><Textarea value={form.names} onChange={(e) => setForm({ ...form, names: e.target.value })} rows={3} /></div>
               <Button onClick={create} className="w-full">Create</Button>
             </div>
@@ -248,19 +261,27 @@ function TeamsPage() {
         <DialogContent className="max-w-lg">
           <DialogHeader><DialogTitle>Edit team details</DialogTitle></DialogHeader>
           <div className="space-y-3">
-            <div><Label>Project title</Label><Input value={editForm.title} onChange={(e) => setEditForm({ ...editForm, title: e.target.value })} /></div>
-            <div><Label>Description</Label><Textarea value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} /></div>
-            <div><Label>Challenge</Label>
-              <Select value={editForm.challenge_id} onValueChange={(v) => setEditForm({ ...editForm, challenge_id: v })}>
-                <SelectTrigger><SelectValue placeholder="None" /></SelectTrigger>
-                <SelectContent>{q.data.challenges.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent>
-              </Select>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <div><Label>Demo URL</Label><Input value={editForm.demo_url} onChange={(e) => setEditForm({ ...editForm, demo_url: e.target.value })} /></div>
-              <div><Label>GitHub</Label><Input value={editForm.github_url} onChange={(e) => setEditForm({ ...editForm, github_url: e.target.value })} /></div>
-            </div>
-            <div><Label>Number of members</Label><Input type="number" min={1} value={editForm.table_number} onChange={(e) => setEditForm({ ...editForm, table_number: e.target.value })} /></div>
+            <label className="flex items-center gap-2 text-sm">
+              <input type="checkbox" checked={editForm.noProject} onChange={(e) => setEditForm({ ...editForm, noProject: e.target.checked })} />
+              Non-competing team (mentors/organizers) — no project, hidden from voting
+            </label>
+            {!editForm.noProject && (
+              <>
+                <div><Label>Project title</Label><Input value={editForm.title} onChange={(e) => setEditForm({ ...editForm, title: e.target.value })} /></div>
+                <div><Label>Description</Label><Textarea value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} /></div>
+                <div><Label>Challenge</Label>
+                  <Select value={editForm.challenge_id} onValueChange={(v) => setEditForm({ ...editForm, challenge_id: v })}>
+                    <SelectTrigger><SelectValue placeholder="None" /></SelectTrigger>
+                    <SelectContent>{q.data.challenges.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent>
+                  </Select>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div><Label>Demo URL</Label><Input value={editForm.demo_url} onChange={(e) => setEditForm({ ...editForm, demo_url: e.target.value })} /></div>
+                  <div><Label>GitHub</Label><Input value={editForm.github_url} onChange={(e) => setEditForm({ ...editForm, github_url: e.target.value })} /></div>
+                </div>
+                <div><Label>Number of members</Label><Input type="number" min={1} value={editForm.table_number} onChange={(e) => setEditForm({ ...editForm, table_number: e.target.value })} /></div>
+              </>
+            )}
             <div><Label>Participant names (comma or newline)</Label><Textarea value={editForm.names} onChange={(e) => setEditForm({ ...editForm, names: e.target.value })} rows={3} /></div>
             {editingId && (
               <div className="space-y-1">
