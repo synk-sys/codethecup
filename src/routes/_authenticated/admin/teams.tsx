@@ -137,9 +137,16 @@ function TeamsPage() {
       if (error) return toast.error(error.message);
     }
     const names = editForm.names.split(/[,\n]/).map((n) => n.trim()).filter(Boolean);
-    await supabase.from("team_members").delete().eq("team_id", teamId);
-    if (names.length) {
-      await supabase.from("team_members").insert(names.map((name) => ({ team_id: teamId, name })));
+    const existingMembers = q.data.members.filter((m) => m.team_id === teamId);
+    const existingNames = new Set(existingMembers.map((m) => m.name));
+    const newNamesSet = new Set(names);
+    const toAdd = names.filter((n) => !existingNames.has(n));
+    const toRemove = existingMembers.filter((m) => !newNamesSet.has(m.name));
+    if (toRemove.length) {
+      await supabase.from("team_members").delete().in("id", toRemove.map((m) => m.id));
+    }
+    if (toAdd.length) {
+      await supabase.from("team_members").insert(toAdd.map((name) => ({ team_id: teamId, name })));
     }
     toast.success("Team updated");
     setEditingId(null);

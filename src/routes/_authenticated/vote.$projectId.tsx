@@ -1,15 +1,15 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { loadEventBundle, weightedScore, scoreLabel, type Criterion } from "@/lib/scoring";
+import { loadEventBundle, scoreLabel, type Criterion } from "@/lib/scoring";
 import { fetchActiveEvent } from "@/lib/auth-helpers";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, ExternalLink, Github, Save, Send, Sparkles, CheckCircle2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowLeft, ExternalLink, Github, Send, Sparkles, CheckCircle2 } from "lucide-react";
 import confetti from "canvas-confetti";
 
 const GOOGLE_COLORS = ["#4285F4", "#EA4335", "#FBBC05", "#34A853"];
@@ -60,13 +60,6 @@ function VotePage() {
       setScores(s);
     }
   }, [q.data?.ballot?.id]);
-
-  const preview = useMemo(() => {
-    if (!q.data) return 0;
-    const { bundle } = q.data;
-    const rows = Object.entries(scores).map(([criterion_id, score]) => ({ criterion_id, score }));
-    return weightedScore(rows, bundle.criteria, bundle.settings?.score_scale_min ?? 1, bundle.settings?.score_scale_max ?? 10);
-  }, [scores, q.data]);
 
   if (q.isLoading) return <div className="container mx-auto px-6 py-12">Loading...</div>;
   if (q.error) return <div className="container mx-auto px-6 py-12">Error: {(q.error as Error).message}</div>;
@@ -184,17 +177,8 @@ function VotePage() {
         className="sticky bottom-4 mt-6 z-30"
       >
         <Card className="p-4 glass gradient-border shadow-[var(--shadow-elevated)]">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="min-w-0">
-              <div className="text-xs text-muted-foreground">Live weighted score</div>
-              <div className="text-3xl font-black tabular-nums gradient-text">{preview.toFixed(1)}<span className="text-lg text-muted-foreground">/100</span></div>
-            </div>
+          <div className="flex flex-wrap items-center justify-end gap-4">
             <div className="flex flex-wrap gap-2">
-              {canEdit && (
-                <Button variant="outline" onClick={() => persist("draft")} disabled={saving}>
-                  <Save className="h-4 w-4 mr-2" /> Save draft
-                </Button>
-              )}
               {canEdit && (
                 <Button onClick={() => persist("submitted")} disabled={saving || !allScored} className="font-semibold">
                   <Send className="h-4 w-4 mr-2" /> {submitted ? "Update vote" : "Submit vote"}
