@@ -69,7 +69,7 @@ function VotePage() {
   const settings = bundle.settings;
   const submitted = ballot?.status === "submitted";
   const votingClosed = event.voting_end ? new Date(event.voting_end) < new Date() : false;
-  const canEdit = !votingClosed && (!submitted || (settings?.allow_vote_edits ?? true));
+  const canEdit = !votingClosed && !submitted;
   const allScored = bundle.criteria.every((c) => scores[c.id] != null);
 
   async function persist(status: "draft" | "submitted") {

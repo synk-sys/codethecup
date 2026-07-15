@@ -95,7 +95,6 @@ function SettingsPage() {
             </Select>
           </Field>
         </div>
-        <Toggle label="Allow vote edits" desc="Participants can update submitted votes before voting closes." v={st.allow_vote_edits} on={(v: boolean) => setSt({ ...st, allow_vote_edits: v })} />
         <Toggle label="Show live rankings" desc="Participants see rankings before voting closes (not recommended)." v={st.live_rankings_visible} on={(v: boolean) => setSt({ ...st, live_rankings_visible: v })} />
         <Toggle label="Block self-voting" desc="Prevent voting on your own team's project." v={st.block_self_voting} on={(v: boolean) => setSt({ ...st, block_self_voting: v })} />
         <Toggle label="Allow same-challenge voting" desc="Teams can vote for projects in the same challenge track." v={st.allow_same_challenge_voting} on={(v: boolean) => setSt({ ...st, allow_same_challenge_voting: v })} />
