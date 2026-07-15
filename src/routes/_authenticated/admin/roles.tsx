@@ -44,7 +44,6 @@ function AccountPage() {
     <div className="space-y-6 max-w-2xl mx-auto">
       <div>
         <h1 className="text-3xl font-black">Account</h1>
-        <p className="text-muted-foreground">Your admin account for this event.</p>
       </div>
 
       <Card className="p-6 glass space-y-3">
