@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { loadEventBundle, scoreLabel, type Criterion } from "@/lib/scoring";
+import { loadEventBundle, type Criterion } from "@/lib/scoring";
 import { fetchActiveEvent } from "@/lib/auth-helpers";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -224,19 +224,9 @@ function CriterionCard({
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.03 }}>
       <Card className="p-5 glass">
-        <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <h3 className="text-lg font-bold" style={{ color: GOOGLE_COLORS[(index - 1) % GOOGLE_COLORS.length] }}>{criterion.name}</h3>
-            </div>
-            {criterion.description && <p className="text-sm text-muted-foreground mt-1">{criterion.description}</p>}
-          </div>
-          {score != null && (
-            <div className="text-right shrink-0">
-              <div className="text-3xl font-black tabular-nums gradient-text">{score}</div>
-              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{scoreLabel(score)}</div>
-            </div>
-          )}
+        <div className="mb-3">
+          <h3 className="text-lg font-bold" style={{ color: GOOGLE_COLORS[(index - 1) % GOOGLE_COLORS.length] }}>{criterion.name}</h3>
+          {criterion.description && <p className="text-sm text-muted-foreground mt-1">{criterion.description}</p>}
         </div>
         <div className="grid grid-cols-5 sm:grid-cols-10 gap-1.5">
           {values.map((v) => {
