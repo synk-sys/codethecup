@@ -213,7 +213,6 @@ function VotePage() {
                 <CheckCircle2 className="h-12 w-12 text-success" />
               </div>
               <h2 className="text-4xl font-black gradient-text">Vote submitted!</h2>
-              <p className="mt-2 text-muted-foreground">Thanks for keeping the arena fair.</p>
             </motion.div>
           </motion.div>
         )}
