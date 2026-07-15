@@ -62,7 +62,7 @@ function AdminDash() {
         <Stat icon={Award} label="Challenges" value={challengesCount} color={GOOGLE_COLORS[3]} />
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
-        <QuickLink to="/admin/teams" title="Add teams & projects" body="Roster your teams and their submissions." />
+        <QuickLink to="/admin/teams" title="Add teams" body="Roster your teams and their submissions." />
         <QuickLink to="/admin/criteria" title="Tune the rubric" body="Edit weights, criteria, and score scale." />
         <QuickLink to="/admin/monitor" title="Watch live progress" body="Track who has voted." />
         <QuickLink to="/admin/results" title="Reveal winners" body="Launch the fullscreen reveal show." icon={Play} />
