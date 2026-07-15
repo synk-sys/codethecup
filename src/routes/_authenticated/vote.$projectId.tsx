@@ -5,7 +5,6 @@ import { loadEventBundle, weightedScore, scoreLabel, type Criterion } from "@/li
 import { fetchActiveEvent } from "@/lib/auth-helpers";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
@@ -38,7 +37,7 @@ function VotePage() {
       const { data: members } = await supabase.from("team_members").select("name, email").eq("team_id", project.team_id);
       const { data: ballot } = await supabase
         .from("ballots")
-        .select("id, status, ballot_scores(criterion_id, score, comment)")
+        .select("id, status, ballot_scores(criterion_id, score)")
         .eq("project_id", projectId)
         .eq("voter_id", userId)
         .maybeSingle();
@@ -47,19 +46,16 @@ function VotePage() {
   });
 
   const [scores, setScores] = useState<Record<string, number>>({});
-  const [comments, setComments] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
     if (q.data?.ballot?.ballot_scores) {
       const s: Record<string, number> = {};
-      const c: Record<string, string> = {};
       for (const row of q.data.ballot.ballot_scores) {
         s[row.criterion_id] = Number(row.score);
-        if (row.comment) c[row.criterion_id] = row.comment;
       }
-      setScores(s); setComments(c);
+      setScores(s);
     }
   }, [q.data?.ballot?.id]);
 
@@ -105,7 +101,6 @@ function VotePage() {
           ballot_id: b.id,
           criterion_id: c.id,
           score: scores[c.id],
-          comment: comments[c.id] || null,
         }));
 
       if (rows.length) {
@@ -173,12 +168,10 @@ function VotePage() {
             index={idx + 1}
             criterion={c}
             score={scores[c.id]}
-            comment={comments[c.id] ?? ""}
             scaleMin={settings?.score_scale_min ?? 1}
             scaleMax={settings?.score_scale_max ?? 10}
             disabled={!canEdit}
             onScore={(v) => setScores((s) => ({ ...s, [c.id]: v }))}
-            onComment={(v) => setComments((s) => ({ ...s, [c.id]: v }))}
           />
         ))}
       </div>
@@ -258,17 +251,15 @@ function RubricCard({ criteria, scaleMin, scaleMax }: { criteria: Criterion[]; s
 }
 
 function CriterionCard({
-  index, criterion, score, comment, scaleMin, scaleMax, disabled, onScore, onComment,
+  index, criterion, score, scaleMin, scaleMax, disabled, onScore,
 }: {
   index: number;
   criterion: Criterion;
   score: number | undefined;
-  comment: string;
   scaleMin: number;
   scaleMax: number;
   disabled: boolean;
   onScore: (v: number) => void;
-  onComment: (v: string) => void;
 }) {
   const values = Array.from({ length: scaleMax - scaleMin + 1 }, (_, i) => scaleMin + i);
   return (
@@ -311,17 +302,6 @@ function CriterionCard({
         <div className="mt-3 flex justify-between text-[10px] text-muted-foreground">
           <span>Poor</span><span>Below avg</span><span>Good</span><span>Very good</span><span>Excellent</span>
         </div>
-        <details className="mt-3">
-          <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">Add private comment</summary>
-          <Textarea
-            value={comment}
-            onChange={(e) => onComment(e.target.value)}
-            placeholder="Notes only visible to you and admins..."
-            disabled={disabled}
-            className="mt-2"
-            rows={2}
-          />
-        </details>
       </Card>
     </motion.div>
   );
