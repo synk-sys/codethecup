@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
-import { ArrowLeft, ExternalLink, Github, Send, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ExternalLink, Github, Send, CheckCircle2, Trophy } from "lucide-react";
 import confetti from "canvas-confetti";
 
 const GOOGLE_COLORS = ["#4285F4", "#EA4335", "#FBBC05", "#34A853"];
@@ -126,23 +126,35 @@ function VotePage() {
         <ArrowLeft className="h-4 w-4" /> Back to teams
       </Link>
 
-      <Card className="p-6 glass mb-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="min-w-0 flex-1">
-            {challenge && (
-              <Badge variant="outline" className="mb-2 gap-1.5">
-                {challenge.name}
-              </Badge>
-            )}
-            <h1 className="text-3xl font-black leading-tight">{project.title || team?.name}</h1>
-            {project.title && <p className="text-muted-foreground mt-1">{team?.name}</p>}
-            {project.description && <p className="mt-4 text-sm leading-relaxed">{project.description}</p>}
-          </div>
-          {project.image_url && (
-            <img src={project.image_url} alt="" className="h-24 w-24 rounded-xl object-cover shrink-0" />
+      <div
+        className="relative overflow-hidden rounded-2xl p-8 mb-6 text-center text-white"
+        style={{
+          background: "linear-gradient(160deg, #006633 0%, #0a8a44 55%, #146c36 100%)",
+          boxShadow: "0 0 0 4px #ffcc00, 0 20px 60px rgba(0,0,0,0.3)",
+        }}
+      >
+        <div
+          className="absolute inset-0 opacity-10 pointer-events-none"
+          style={{ backgroundImage: "repeating-linear-gradient(45deg, #fff 0, #fff 2px, transparent 2px, transparent 14px)" }}
+        />
+        <div className="relative">
+          <Trophy className="h-8 w-8 mx-auto mb-2 text-yellow-300 drop-shadow" />
+          {challenge && (
+            <div className="inline-block mb-2 px-4 py-1 rounded-full bg-white/15 backdrop-blur text-sm font-semibold border border-white/30">
+              {challenge.name}
+            </div>
           )}
+          <h1 className="text-3xl font-black uppercase tracking-wide leading-tight drop-shadow-sm">{team?.name}</h1>
+          {project.title && <p className="text-white/80 mt-1">{project.title}</p>}
+          {project.image_url && (
+            <img src={project.image_url} alt="" className="h-24 w-24 rounded-xl object-cover mx-auto mt-4" />
+          )}
+          {project.description && <p className="mt-4 text-sm leading-relaxed text-white/90 max-w-xl mx-auto">{project.description}</p>}
         </div>
-        <div className="mt-4 flex flex-wrap gap-4 text-sm">
+      </div>
+
+      <Card className="p-6 glass mb-6">
+        <div className="flex flex-wrap gap-4 text-sm">
           {project.demo_url && <a href={project.demo_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline"><ExternalLink className="h-3.5 w-3.5" /> Demo</a>}
           {project.github_url && <a href={project.github_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline"><Github className="h-3.5 w-3.5" /> Code</a>}
         </div>
