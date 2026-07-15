@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
-import { ArrowLeft, ExternalLink, Github, Send, CheckCircle2, Trophy } from "lucide-react";
+import { ArrowLeft, ExternalLink, Github, Send, CheckCircle2 } from "lucide-react";
 import confetti from "canvas-confetti";
 
 const GOOGLE_COLORS = ["#4285F4", "#EA4335", "#FBBC05", "#34A853"];
@@ -127,29 +127,26 @@ function VotePage() {
       </Link>
 
       <div
-        className="relative overflow-hidden rounded-2xl p-8 mb-6 text-center text-white"
-        style={{
-          background: "linear-gradient(160deg, #006633 0%, #0a8a44 55%, #146c36 100%)",
-          boxShadow: "0 0 0 4px #ffcc00, 0 20px 60px rgba(0,0,0,0.3)",
-        }}
+        className="relative overflow-hidden rounded-2xl p-8 mb-6 text-center"
+        style={{ background: "var(--gradient-stage)" }}
       >
-        <div
-          className="absolute inset-0 opacity-10 pointer-events-none"
-          style={{ backgroundImage: "repeating-linear-gradient(45deg, #fff 0, #fff 2px, transparent 2px, transparent 14px)" }}
-        />
         <div className="relative">
-          <Trophy className="h-8 w-8 mx-auto mb-2 text-yellow-300 drop-shadow" />
+          <div className="flex items-center justify-center gap-2 mb-4">
+            {GOOGLE_COLORS.map((c) => (
+              <span key={c} className="h-2 w-2 rounded-full" style={{ backgroundColor: c }} />
+            ))}
+          </div>
           {challenge && (
-            <div className="inline-block mb-2 px-4 py-1 rounded-full bg-white/15 backdrop-blur text-sm font-semibold border border-white/30">
+            <div className="inline-block mb-3 px-4 py-1 rounded-full bg-background/60 backdrop-blur text-sm font-semibold border border-border">
               {challenge.name}
             </div>
           )}
-          <h1 className="text-3xl font-black uppercase tracking-wide leading-tight drop-shadow-sm">{team?.name}</h1>
-          {project.title && <p className="text-white/80 mt-1">{project.title}</p>}
+          <h1 className="text-3xl sm:text-4xl font-black tracking-wide leading-tight gradient-text">{team?.name}</h1>
+          {project.title && <p className="text-muted-foreground mt-1">{project.title}</p>}
           {project.image_url && (
             <img src={project.image_url} alt="" className="h-24 w-24 rounded-xl object-cover mx-auto mt-4" />
           )}
-          {project.description && <p className="mt-4 text-sm leading-relaxed text-white/90 max-w-xl mx-auto">{project.description}</p>}
+          {project.description && <p className="mt-4 text-sm leading-relaxed max-w-xl mx-auto">{project.description}</p>}
         </div>
       </div>
 
