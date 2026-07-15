@@ -85,8 +85,7 @@ function ResultsPage() {
                 <div className="flex items-center gap-4">
                   <div className={`text-3xl font-black tabular-nums w-12 ${isWinner ? "gradient-text" : "text-muted-foreground"}`}>#{i + 1}</div>
                   <div className="min-w-0 flex-1">
-                    <h3 className="text-lg font-bold truncate">{p?.title}</h3>
-                    <p className="text-sm text-muted-foreground">{t?.name}</p>
+                    <h3 className="text-lg font-bold truncate">{t?.name}</h3>
                   </div>
                   <div className="text-right">
                     <div className="text-2xl font-black tabular-nums">{r.final_score.toFixed(1)}</div>

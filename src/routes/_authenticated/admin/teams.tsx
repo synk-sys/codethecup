@@ -51,7 +51,7 @@ function TeamsPage() {
 
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
-    teamName: "", title: "", description: "", challenge_id: "",
+    teamName: "", description: "", challenge_id: "",
     demo_url: "", github_url: "", table_number: "", names: "", noProject: false,
   });
 
@@ -62,7 +62,7 @@ function TeamsPage() {
     await supabase.from("team_passcodes").insert({ team_id: team.id, passcode: randomPasscode() });
     if (!form.noProject) {
       const { error: e2 } = await supabase.from("projects").insert({
-        event_id: q.data.event.id, team_id: team.id, title: form.title.trim() || null,
+        event_id: q.data.event.id, team_id: team.id,
         description: form.description, challenge_id: form.challenge_id || null,
         demo_url: form.demo_url || null, github_url: form.github_url || null,
         table_number: form.table_number || null,
@@ -74,7 +74,7 @@ function TeamsPage() {
       await supabase.from("team_members").insert(names.map((name) => ({ team_id: team.id, name })));
     }
     toast.success("Team created");
-    setForm({ teamName: "", title: "", description: "", challenge_id: "", demo_url: "", github_url: "", table_number: "", names: "", noProject: false });
+    setForm({ teamName: "", description: "", challenge_id: "", demo_url: "", github_url: "", table_number: "", names: "", noProject: false });
     setOpen(false);
     qc.invalidateQueries({ queryKey: ["admin-teams"] });
   }
@@ -100,14 +100,13 @@ function TeamsPage() {
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({
-    title: "", description: "", challenge_id: "",
+    description: "", challenge_id: "",
     demo_url: "", github_url: "", table_number: "", names: "", noProject: false,
   });
 
   function openEdit(teamId: string, project: any, members: any[]) {
     setEditingId(teamId);
     setEditForm({
-      title: project?.title ?? "",
       description: project?.description ?? "",
       challenge_id: project?.challenge_id ?? "",
       demo_url: project?.demo_url ?? "",
@@ -126,7 +125,7 @@ function TeamsPage() {
       }
     } else if (existingProject) {
       const { error } = await supabase.from("projects").update({
-        title: editForm.title.trim() || null, description: editForm.description,
+        description: editForm.description,
         challenge_id: editForm.challenge_id || null,
         demo_url: editForm.demo_url || null, github_url: editForm.github_url || null,
         table_number: editForm.table_number || null,
@@ -134,7 +133,7 @@ function TeamsPage() {
       if (error) return toast.error(error.message);
     } else {
       const { error } = await supabase.from("projects").insert({
-        event_id: q.data.event.id, team_id: teamId, title: editForm.title.trim() || null,
+        event_id: q.data.event.id, team_id: teamId,
         description: editForm.description, challenge_id: editForm.challenge_id || null,
         demo_url: editForm.demo_url || null, github_url: editForm.github_url || null,
         table_number: editForm.table_number || null,
@@ -196,7 +195,6 @@ function TeamsPage() {
               </label>
               {!form.noProject && (
                 <>
-                  <div><Label>Project title (optional)</Label><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} /></div>
                   <div><Label>Description</Label><Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
                   <div><Label>Challenge</Label>
                     <Select value={form.challenge_id} onValueChange={(v) => setForm({ ...form, challenge_id: v })}>
@@ -233,7 +231,7 @@ function TeamsPage() {
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2"><Shirt className="h-4 w-4 text-primary" /><h3 className="font-bold">{t.name}</h3></div>
-                  {p && <div className="mt-1"><div className="font-semibold">{p.title}</div><div className="text-sm text-muted-foreground">{p.description}</div></div>}
+                  {p?.description && <div className="mt-1 text-sm text-muted-foreground">{p.description}</div>}
                   <div className="mt-2 flex flex-wrap gap-2 text-xs text-muted-foreground">
                     {ch && <span>Challenge: {ch.name}</span>}
                     <span>{p?.table_number ?? members.length} member{(p?.table_number ?? members.length) === "1" || (p?.table_number ?? members.length) === 1 ? "" : "s"}</span>
@@ -267,7 +265,6 @@ function TeamsPage() {
             </label>
             {!editForm.noProject && (
               <>
-                <div><Label>Project title</Label><Input value={editForm.title} onChange={(e) => setEditForm({ ...editForm, title: e.target.value })} /></div>
                 <div><Label>Description</Label><Textarea value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} /></div>
                 <div><Label>Challenge</Label>
                   <Select value={editForm.challenge_id} onValueChange={(v) => setEditForm({ ...editForm, challenge_id: v })}>
@@ -334,7 +331,6 @@ function TeamsPage() {
                       {ch.name}
                     </div>
                   )}
-                  {p?.title && <div className="text-lg font-bold mb-4">{p.title}</div>}
                   <div className="mt-2 rounded-xl bg-black/20 backdrop-blur p-4 text-left">
                     <div className="text-xs uppercase tracking-widest text-yellow-200 font-semibold mb-2 text-center">Squad</div>
                     {members.length > 0 ? (

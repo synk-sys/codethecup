@@ -62,7 +62,7 @@ function VoteDashboard() {
     if (search) {
       const needle = search.toLowerCase();
       const t = teamById.get(p.team_id);
-      if (!(p.title ?? "").toLowerCase().includes(needle) && !(t?.name.toLowerCase().includes(needle))) return false;
+      if (!t?.name.toLowerCase().includes(needle)) return false;
     }
     return true;
   });
@@ -151,8 +151,7 @@ function VoteDashboard() {
                         </Badge>
                       )}
                     </div>
-                    <h3 className="text-lg font-bold leading-tight line-clamp-2">{p.title || team?.name}</h3>
-                    <p className="text-sm text-muted-foreground mt-1">{team?.name}</p>
+                    <h3 className="text-lg font-bold leading-tight line-clamp-2">{team?.name}</h3>
                     {p.description && <p className="text-sm text-muted-foreground/80 mt-3 line-clamp-3">{p.description}</p>}
                     <div className="mt-4 pt-4 border-t border-border/60 flex items-center justify-end text-xs text-muted-foreground">
                       <span className="inline-flex items-center gap-1 font-semibold text-primary group-hover:gap-2 transition-all">

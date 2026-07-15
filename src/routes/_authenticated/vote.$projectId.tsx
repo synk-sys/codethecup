@@ -140,7 +140,6 @@ function VotePage() {
             </div>
           )}
           <h1 className="text-4xl sm:text-5xl font-black tracking-wide leading-tight gradient-text">{team?.name}</h1>
-          {project.title && <p className="text-muted-foreground mt-1">{project.title}</p>}
           {project.image_url && (
             <img src={project.image_url} alt="" className="h-24 w-24 rounded-xl object-cover mx-auto mt-4" />
           )}

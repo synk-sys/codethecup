@@ -45,11 +45,11 @@ function AdminResults() {
   const numWinners = bundle.settings?.number_of_winners ?? 2;
 
   function exportCsv() {
-    const rows = [["rank", "team", "project", "final_score", "ballots"].join(",")];
+    const rows = [["rank", "team", "final_score", "ballots"].join(",")];
     results.forEach((r, i) => {
       const p = projectById.get(r.project_id);
       const t = p ? teamById.get(p.team_id) : null;
-      rows.push([i + 1, JSON.stringify(t?.name ?? ""), JSON.stringify(p?.title ?? ""), r.final_score, r.team_ballots].join(","));
+      rows.push([i + 1, JSON.stringify(t?.name ?? ""), r.final_score, r.team_ballots].join(","));
     });
     const blob = new Blob([rows.join("\n")], { type: "text/csv" });
     const a = document.createElement("a");
@@ -60,7 +60,8 @@ function AdminResults() {
 
   const chartData = results.slice(0, 8).map((r) => {
     const p = projectById.get(r.project_id);
-    return { name: p?.title?.slice(0, 20) ?? "?", score: r.final_score };
+    const t = p ? teamById.get(p.team_id) : null;
+    return { name: t?.name?.slice(0, 20) ?? "?", score: r.final_score };
   });
   const top = results[0];
   const radarData = bundle.criteria.map((c) => ({
@@ -116,8 +117,7 @@ function AdminResults() {
               <div key={r.project_id} className={`flex items-center gap-3 rounded-lg p-3 ${isWinner ? "bg-primary/10 border border-primary/30" : "border border-border/40"}`}>
                 <div className={`text-xl font-black tabular-nums w-8 ${isWinner ? "gradient-text" : "text-muted-foreground"}`}>#{i + 1}</div>
                 <div className="min-w-0 flex-1">
-                  <div className="font-semibold truncate">{p?.title}</div>
-                  <div className="text-xs text-muted-foreground">{t?.name}</div>
+                  <div className="font-semibold truncate">{t?.name}</div>
                 </div>
                 <div className="text-right">
                   <div className="text-lg font-black tabular-nums">{r.final_score.toFixed(1)}</div>

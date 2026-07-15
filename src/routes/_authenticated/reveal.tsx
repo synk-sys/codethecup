@@ -129,8 +129,7 @@ function WinnerCard({ rank, r, projectById, teamById }: any) {
     <motion.div initial={{ scale: 0.6, opacity: 0, rotateX: -30 }} animate={{ scale: 1, opacity: 1, rotateX: 0 }} exit={{ scale: 0.8, opacity: 0 }} transition={{ type: "spring", damping: 12 }} className="text-center px-6">
       <div className="text-3xl font-black text-muted-foreground mb-4">#{rank}</div>
       <div className="text-2xl uppercase tracking-widest text-primary mb-2">{rank === 1 ? "First Place" : "Second Place"}</div>
-      <h2 className="text-7xl md:text-8xl font-black gradient-text leading-none">{p?.title}</h2>
-      <p className="mt-6 text-3xl font-semibold">{t?.name}</p>
+      <h2 className="text-7xl md:text-8xl font-black gradient-text leading-none">{t?.name}</h2>
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} className="mt-8 text-6xl font-black tabular-nums">
         {r.final_score.toFixed(1)}<span className="text-2xl text-muted-foreground">/100</span>
       </motion.div>
@@ -145,8 +144,7 @@ function PodiumCol({ rank, height, r, projectById, teamById }: any) {
     <div className="w-64 text-center">
       <div className="mb-3">
         <div className="text-xs uppercase tracking-widest text-muted-foreground">{rank === 1 ? "1st" : "2nd"}</div>
-        <div className="font-bold text-lg line-clamp-2">{p?.title}</div>
-        <div className="text-sm text-muted-foreground">{t?.name}</div>
+        <div className="font-bold text-lg line-clamp-2">{t?.name}</div>
         <div className="text-2xl font-black tabular-nums mt-1">{r.final_score.toFixed(1)}</div>
       </div>
       <div className={`${height} rounded-t-xl gradient-border`} style={{ background: rank === 1 ? "var(--gradient-hero)" : "var(--gradient-cool)" }} />
