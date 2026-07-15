@@ -292,6 +292,12 @@ function Landing() {
           ))}
         </motion.div>
       </main>
+
+      <div className="relative text-center text-xs text-muted-foreground pb-6 space-y-0.5">
+        <p>⚽ Built for fans</p>
+        <p>Developed by Kritima Kukreja</p>
+        <p>Powered by SynkTech</p>
+      </div>
     </div>
   );
 }
