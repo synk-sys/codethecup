@@ -58,15 +58,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Code the Cup — Peer-Judged Hackathons" },
+      { title: "Code the Cup" },
       { name: "description", content: "Run high-energy peer-voted hackathons. Fair, anonymous, weighted scoring with a Kahoot-style winner reveal." },
-      { property: "og:title", content: "Code the Cup — Peer-Judged Hackathons" },
+      { property: "og:title", content: "Code the Cup" },
       { property: "og:description", content: "Run high-energy peer-voted hackathons. Fair, anonymous, weighted scoring with a Kahoot-style winner reveal." },
       { property: "og:type", content: "website" },
       { property: "og:image", content: "https://codethecup-nine.vercel.app/og-image.png" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:image", content: "https://codethecup-nine.vercel.app/og-image.png" },
-      { name: "twitter:title", content: "Code the Cup — Peer-Judged Hackathons" },
+      { name: "twitter:title", content: "Code the Cup" },
       { name: "twitter:description", content: "Run high-energy peer-voted hackathons. Fair, anonymous, weighted scoring with a Kahoot-style winner reveal." },
     ],
     links: [
