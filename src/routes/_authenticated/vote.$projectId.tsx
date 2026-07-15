@@ -175,7 +175,7 @@ function VotePage() {
         className="sticky bottom-4 mt-6 z-30"
       >
         <Card className="p-4 glass gradient-border shadow-[var(--shadow-elevated)]">
-          <div className="flex flex-wrap items-center justify-end gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-4">
             <div className="flex flex-wrap gap-2">
               {canEdit && (
                 <Button onClick={() => persist("submitted")} disabled={saving || !allScored} className="font-semibold">
