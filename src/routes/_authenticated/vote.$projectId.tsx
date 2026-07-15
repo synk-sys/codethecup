@@ -141,7 +141,7 @@ function VotePage() {
               {challenge.name}
             </div>
           )}
-          <h1 className="text-3xl sm:text-4xl font-black tracking-wide leading-tight gradient-text">{team?.name}</h1>
+          <h1 className="text-4xl sm:text-5xl font-black tracking-wide leading-tight gradient-text">{team?.name}</h1>
           {project.title && <p className="text-muted-foreground mt-1">{project.title}</p>}
           {project.image_url && (
             <img src={project.image_url} alt="" className="h-24 w-24 rounded-xl object-cover mx-auto mt-4" />
@@ -150,18 +150,22 @@ function VotePage() {
         </div>
       </div>
 
-      <Card className="p-6 glass mb-6">
-        <div className="flex flex-wrap gap-4 text-sm">
-          {project.demo_url && <a href={project.demo_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline"><ExternalLink className="h-3.5 w-3.5" /> Demo</a>}
-          {project.github_url && <a href={project.github_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline"><Github className="h-3.5 w-3.5" /> Code</a>}
-        </div>
-        {members.length > 0 && (
-          <div className="mt-4 pt-4 border-t border-border/60">
-            <div className="text-xs text-muted-foreground mb-1">Team members</div>
-            <div className="text-sm">{members.map((m) => m.name || m.email).join(" • ")}</div>
-          </div>
-        )}
-      </Card>
+      {(project.demo_url || project.github_url || members.length > 0) && (
+        <Card className="p-6 glass mb-6">
+          {(project.demo_url || project.github_url) && (
+            <div className="flex flex-wrap gap-4 text-sm">
+              {project.demo_url && <a href={project.demo_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline"><ExternalLink className="h-3.5 w-3.5" /> Demo</a>}
+              {project.github_url && <a href={project.github_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline"><Github className="h-3.5 w-3.5" /> Code</a>}
+            </div>
+          )}
+          {members.length > 0 && (
+            <div className={(project.demo_url || project.github_url) ? "mt-4 pt-4 border-t border-border/60" : ""}>
+              <div className="text-xs text-muted-foreground mb-1">Team members</div>
+              <div className="text-sm">{members.map((m) => m.name || m.email).join(" • ")}</div>
+            </div>
+          )}
+        </Card>
+      )}
 
       <div className="mt-6 space-y-4">
         {bundle.criteria.map((c, idx) => (
