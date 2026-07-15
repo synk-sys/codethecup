@@ -12,6 +12,8 @@ import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, ExternalLink, Github, Save, Send, Sparkles, CheckCircle2 } from "lucide-react";
 import confetti from "canvas-confetti";
 
+const GOOGLE_COLORS = ["#4285F4", "#EA4335", "#FBBC05", "#34A853"];
+
 export const Route = createFileRoute("/_authenticated/vote/$projectId")({
   head: () => ({ meta: [{ title: "Vote — Code the Cup" }] }),
   component: VotePage,
@@ -268,7 +270,7 @@ function CriterionCard({
         <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <h3 className="text-lg font-bold">{criterion.name}</h3>
+              <h3 className="text-lg font-bold" style={{ color: GOOGLE_COLORS[(index - 1) % GOOGLE_COLORS.length] }}>{criterion.name}</h3>
               <Badge variant="secondary">{Number(criterion.weight)}%</Badge>
             </div>
             {criterion.description && <p className="text-sm text-muted-foreground mt-1">{criterion.description}</p>}
