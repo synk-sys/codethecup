@@ -276,7 +276,7 @@ function Landing() {
           {[
             { icon: Users, title: "Everyone votes", body: "No separate judges. Every participant scores every eligible project — never their own." },
             { icon: Shield, title: "Fair & anonymous", body: "Ballots are anonymous by design, so scores reflect the project, not the popularity." },
-            { icon: Zap, title: "Weighted rubrics", body: "Configure criteria, weights, and score scales. Live weighted preview as you rate." },
+            { icon: Zap, title: "Weighted rubrics", body: "Configure criteria, weights, and score scales for fair, consistent judging." },
             { icon: Trophy, title: "Big reveal", body: "Fullscreen Kahoot-style reveal: countdown → 2nd → 1st → confetti podium." },
           ].map(({ icon: Icon, title, body }, i) => (
             <div key={title} className="glass rounded-2xl p-6">

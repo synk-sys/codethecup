@@ -18,14 +18,6 @@ export function weightedScore(scores: ScoreRow[], criteria: Criterion[], scaleMi
   return Math.round(sum * 10) / 10;
 }
 
-export function scoreLabel(v: number) {
-  if (v <= 2) return "Poor";
-  if (v <= 4) return "Below Avg";
-  if (v <= 6) return "Good";
-  if (v <= 8) return "Very Good";
-  return "Excellent";
-}
-
 /**
  * Compute final rankings across projects using submitted ballots.
  * Returns projects sorted by final score.

@@ -51,8 +51,8 @@ function TeamsPage() {
 
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
-    teamName: "", description: "", challenge_id: "",
-    demo_url: "", github_url: "", table_number: "", names: "", noProject: false,
+    teamName: "", challenge_id: "",
+    demo_url: "", table_number: "", names: "", noProject: false,
   });
 
   async function create() {
@@ -63,8 +63,8 @@ function TeamsPage() {
     if (!form.noProject) {
       const { error: e2 } = await supabase.from("projects").insert({
         event_id: q.data.event.id, team_id: team.id,
-        description: form.description, challenge_id: form.challenge_id || null,
-        demo_url: form.demo_url || null, github_url: form.github_url || null,
+        challenge_id: form.challenge_id || null,
+        demo_url: form.demo_url || null,
         table_number: form.table_number || null,
       });
       if (e2) return toast.error(e2.message);
@@ -74,7 +74,7 @@ function TeamsPage() {
       await supabase.from("team_members").insert(names.map((name) => ({ team_id: team.id, name })));
     }
     toast.success("Team created");
-    setForm({ teamName: "", description: "", challenge_id: "", demo_url: "", github_url: "", table_number: "", names: "", noProject: false });
+    setForm({ teamName: "", challenge_id: "", demo_url: "", table_number: "", names: "", noProject: false });
     setOpen(false);
     qc.invalidateQueries({ queryKey: ["admin-teams"] });
   }
