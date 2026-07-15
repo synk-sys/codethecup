@@ -80,6 +80,7 @@ function TeamsPage() {
   }
 
   async function delTeam(id: string) {
+    await supabase.from("ballots").delete().eq("voter_team_id", id);
     await supabase.from("teams").delete().eq("id", id);
     qc.invalidateQueries({ queryKey: ["admin-teams"] });
   }
