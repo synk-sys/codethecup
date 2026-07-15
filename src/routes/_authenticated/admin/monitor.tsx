@@ -29,13 +29,16 @@ function MonitorPage() {
   if (!q.data) return <div>Loading...</div>;
   const { teams, projects, ballots } = q.data;
   const totalExpected = teams.length * Math.max(0, projects.length - 1);
-  const totalSubmitted = ballots.filter((b) => b.status === "submitted").length;
 
   const projectByTeam = new Map(projects.map((p) => [p.team_id, p]));
-  const submittedByTeam = new Map<string, number>();
+  // A team's vote counts once per project regardless of how many members voted.
+  const votedProjectsByTeam = new Map<string, Set<string>>();
   for (const b of ballots.filter((x) => x.status === "submitted" && x.voter_team_id)) {
-    submittedByTeam.set(b.voter_team_id!, (submittedByTeam.get(b.voter_team_id!) ?? 0) + 1);
+    if (!votedProjectsByTeam.has(b.voter_team_id!)) votedProjectsByTeam.set(b.voter_team_id!, new Set());
+    votedProjectsByTeam.get(b.voter_team_id!)!.add(b.project_id);
   }
+  const submittedByTeam = new Map(Array.from(votedProjectsByTeam, ([teamId, set]) => [teamId, set.size]));
+  const totalSubmitted = Array.from(submittedByTeam.values()).reduce((s, n) => s + n, 0);
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
@@ -43,7 +46,7 @@ function MonitorPage() {
       <Card className="p-5 glass">
         <div className="flex items-center justify-between text-sm font-medium">
           <span>Overall completion</span>
-          <span className="tabular-nums">{totalSubmitted} / {totalExpected} ballots</span>
+          <span className="tabular-nums">{totalSubmitted} / {totalExpected} team votes</span>
         </div>
         <Progress value={totalExpected ? (totalSubmitted / totalExpected) * 100 : 0} className="mt-3 h-3" />
       </Card>

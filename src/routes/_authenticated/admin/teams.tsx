@@ -91,10 +91,10 @@ function TeamsPage() {
     qc.invalidateQueries({ queryKey: ["admin-teams"] });
   }
 
-  async function unlinkMember(memberId: string) {
-    const { error } = await supabase.from("team_members").update({ user_id: null }).eq("id", memberId);
+  async function resetTeamSignIn(teamId: string) {
+    const { error } = await supabase.from("teams").update({ claimed_user_id: null }).eq("id", teamId);
     if (error) return toast.error(error.message);
-    toast.success("Unlinked — this name can be claimed again");
+    toast.success("Reset — this team's passcode can be used to sign in again");
     qc.invalidateQueries({ queryKey: ["admin-teams"] });
   }
 
@@ -283,16 +283,12 @@ function TeamsPage() {
               </>
             )}
             <div><Label>Participant names (comma or newline)</Label><Textarea value={editForm.names} onChange={(e) => setEditForm({ ...editForm, names: e.target.value })} rows={3} /></div>
-            {editingId && (
-              <div className="space-y-1">
-                {(membersByTeam.get(editingId) ?? []).filter((m) => m.user_id).map((m) => (
-                  <div key={m.id} className="flex items-center justify-between text-xs bg-muted/40 rounded-md px-2 py-1">
-                    <span>{m.name} — joined</span>
-                    <button type="button" onClick={() => unlinkMember(m.id)} className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground">
-                      <Unlink className="h-3 w-3" /> Unlink
-                    </button>
-                  </div>
-                ))}
+            {editingId && q.data.teams.find((t) => t.id === editingId)?.claimed_user_id && (
+              <div className="flex items-center justify-between text-xs bg-muted/40 rounded-md px-2 py-1">
+                <span>Signed in on a device</span>
+                <button type="button" onClick={() => resetTeamSignIn(editingId)} className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground">
+                  <Unlink className="h-3 w-3" /> Reset sign-in
+                </button>
               </div>
             )}
             <Button
@@ -329,7 +325,10 @@ function TeamsPage() {
                 />
                 <div className="relative">
                   <Trophy className="h-10 w-10 mx-auto mb-3 text-yellow-300 drop-shadow" />
-                  <h2 className="text-3xl font-black uppercase tracking-wide drop-shadow-sm mb-3">{t.name}</h2>
+                  <h2 className="text-3xl font-black uppercase tracking-wide drop-shadow-sm mb-1">{t.name}</h2>
+                  {t.claimed_user_id && (
+                    <div className="text-[10px] uppercase tracking-widest text-yellow-200/80 mb-2">Signed in</div>
+                  )}
                   {ch && (
                     <div className="inline-block mb-4 px-4 py-1 rounded-full bg-white/15 backdrop-blur text-sm font-semibold border border-white/30">
                       {ch.name}
@@ -344,7 +343,6 @@ function TeamsPage() {
                           <li key={m.id} className="flex items-center gap-3 text-sm">
                             <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-yellow-300 text-[#006633] font-black text-xs">{i + 1}</span>
                             <span className="font-medium">{m.name || "Unnamed"}</span>
-                            {m.user_id && <span className="text-[10px] uppercase tracking-wide text-yellow-200/80 ml-auto">Joined</span>}
                           </li>
                         ))}
                       </ul>

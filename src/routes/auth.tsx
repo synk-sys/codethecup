@@ -35,8 +35,6 @@ function AuthPage() {
 
   const [teams, setTeams] = useState<{ id: string; name: string }[]>([]);
   const [teamId, setTeamId] = useState("");
-  const [members, setMembers] = useState<{ id: string; name: string }[]>([]);
-  const [memberId, setMemberId] = useState("");
   const [passcode, setPasscode] = useState("");
 
   useEffect(() => {
@@ -57,20 +55,12 @@ function AuthPage() {
     })();
   }, [mode]);
 
-  useEffect(() => {
-    if (!teamId) return setMembers([]);
-    (async () => {
-      const { data } = await supabase.from("team_members").select("id,name").eq("team_id", teamId).not("name", "is", null).order("name");
-      setMembers((data ?? []) as { id: string; name: string }[]);
-    })();
-  }, [teamId]);
-
   async function joinAsParticipant(e: React.FormEvent) {
     e.preventDefault();
-    if (!memberId || !passcode.trim()) return toast.error("Pick your name and enter the passcode");
+    if (!teamId || !passcode.trim()) return toast.error("Pick your team and enter the passcode");
     setLoading(true);
-    const { error } = await supabase.rpc("claim_team_member", {
-      _team_member_id: memberId,
+    const { error } = await supabase.rpc("claim_team", {
+      _team_id: teamId,
       _passcode: passcode.trim().toUpperCase(),
     });
     setLoading(false);
@@ -127,16 +117,9 @@ function AuthPage() {
                 <form onSubmit={joinAsParticipant} className="space-y-4">
                   <div className="space-y-2">
                     <Label>Team</Label>
-                    <Select value={teamId} onValueChange={(v) => { setTeamId(v); setMemberId(""); }}>
+                    <Select value={teamId} onValueChange={setTeamId}>
                       <SelectTrigger><SelectValue placeholder="Select your team" /></SelectTrigger>
                       <SelectContent>{teams.map((t) => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}</SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Your name</Label>
-                    <Select value={memberId} onValueChange={setMemberId} disabled={!teamId}>
-                      <SelectTrigger><SelectValue placeholder="Select your name" /></SelectTrigger>
-                      <SelectContent>{members.map((m) => <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>)}</SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
