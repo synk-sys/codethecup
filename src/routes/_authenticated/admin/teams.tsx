@@ -80,8 +80,10 @@ function TeamsPage() {
   }
 
   async function delTeam(id: string) {
-    await supabase.from("ballots").delete().eq("voter_team_id", id);
-    await supabase.from("teams").delete().eq("id", id);
+    const { error: ballotErr } = await supabase.from("ballots").delete().eq("voter_team_id", id);
+    if (ballotErr) return toast.error(`Could not delete this team's votes: ${ballotErr.message}`);
+    const { error } = await supabase.from("teams").delete().eq("id", id);
+    if (error) return toast.error(error.message);
     qc.invalidateQueries({ queryKey: ["admin-teams"] });
   }
 
