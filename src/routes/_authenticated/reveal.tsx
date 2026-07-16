@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchActiveEvent } from "@/lib/auth-helpers";
@@ -16,6 +16,7 @@ export const Route = createFileRoute("/_authenticated/reveal")({
 type Stage = "title" | "countdown" | "second" | "first" | "podium";
 
 function RevealPage() {
+  const navigate = useNavigate();
   const q = useQuery({
     queryKey: ["reveal"],
     queryFn: async () => {
@@ -58,6 +59,10 @@ function RevealPage() {
       if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); next(); }
       if (e.key === "ArrowLeft") prev();
       if (e.key === "f") document.documentElement.requestFullscreen?.();
+      if (e.key === "Escape") {
+        if (document.fullscreenElement) document.exitFullscreen?.();
+        navigate({ to: "/admin/results" });
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -117,7 +122,6 @@ function RevealPage() {
           {stage === "title" ? "Start countdown" : stage === "countdown" ? "Reveal 2nd" : stage === "second" ? "Reveal 1st" : "Show podium"}
         </Button>
       </div>
-      <div className="fixed top-4 right-4 text-xs text-muted-foreground">Space/→ next • ← back • F fullscreen</div>
     </div>
   );
 }
@@ -130,9 +134,6 @@ function WinnerCard({ rank, r, projectById, teamById }: any) {
       <div className="text-3xl font-black text-muted-foreground mb-4">#{rank}</div>
       <div className="text-2xl uppercase tracking-widest text-primary mb-2">{rank === 1 ? "First Place" : "Second Place"}</div>
       <h2 className="text-7xl md:text-8xl font-black gradient-text leading-none">{t?.name}</h2>
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} className="mt-8 text-6xl font-black tabular-nums">
-        {r.final_score.toFixed(1)}<span className="text-2xl text-muted-foreground">/100</span>
-      </motion.div>
     </motion.div>
   );
 }
@@ -145,7 +146,6 @@ function PodiumCol({ rank, height, r, projectById, teamById }: any) {
       <div className="mb-3">
         <div className="text-xs uppercase tracking-widest text-muted-foreground">{rank === 1 ? "1st" : "2nd"}</div>
         <div className="font-bold text-lg line-clamp-2">{t?.name}</div>
-        <div className="text-2xl font-black tabular-nums mt-1">{r.final_score.toFixed(1)}</div>
       </div>
       <div className={`${height} rounded-t-xl gradient-border`} style={{ background: rank === 1 ? "var(--gradient-hero)" : "var(--gradient-cool)" }} />
     </div>
