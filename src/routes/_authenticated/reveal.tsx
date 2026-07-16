@@ -9,6 +9,8 @@ import confetti from "canvas-confetti";
 import { Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+const GOOGLE_COLORS = ["#4285F4", "#EA4335", "#FBBC05", "#34A853"];
+
 export const Route = createFileRoute("/_authenticated/reveal")({
   component: RevealPage,
 });
@@ -111,26 +113,15 @@ function RevealPage() {
             key="podium"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center relative rounded-3xl p-10 overflow-hidden"
-            style={{ background: "radial-gradient(ellipse 120% 80% at 50% -10%, #2a2f45 0%, #0b0e1a 60%, #05060c 100%)", boxShadow: "0 0 0 3px rgba(255,204,0,0.5)" }}
+            className="text-center relative rounded-3xl p-10 overflow-hidden glass"
           >
-            {/* floodlight beams */}
-            <div className="absolute inset-0 pointer-events-none overflow-hidden">
-              {[-1, 0, 1].map((i) => (
-                <div
-                  key={i}
-                  className="absolute top-[-10%] h-[140%] w-[35%]"
-                  style={{
-                    left: `${50 + i * 26}%`,
-                    background: "linear-gradient(180deg, rgba(255,204,0,0.16), transparent 70%)",
-                    transform: `translateX(-50%) rotate(${i * 8}deg)`,
-                    clipPath: "polygon(46% 0%, 54% 0%, 100% 100%, 0% 100%)",
-                  }}
-                />
+            <div className="flex items-center justify-center gap-2 mb-4">
+              {GOOGLE_COLORS.map((c) => (
+                <span key={c} className="h-2 w-2 rounded-full" style={{ backgroundColor: c }} />
               ))}
             </div>
-            <Trophy className="relative h-10 w-10 mx-auto mb-3 text-yellow-300 drop-shadow" />
-            <h2 className="relative text-5xl font-black mb-10 text-white uppercase tracking-wide">Top 3</h2>
+            <Trophy className="relative h-10 w-10 mx-auto mb-3 text-primary animate-pulse-glow" />
+            <h2 className="relative text-5xl font-black mb-10 gradient-text">Top 3</h2>
             <div className="relative flex items-end justify-center">
               {second && <PodiumCol rank={2} height="h-36" r={second} projectById={projectById} teamById={teamById} />}
               {first && <PodiumCol rank={1} height="h-52" r={first} projectById={projectById} teamById={teamById} />}
@@ -165,8 +156,7 @@ function WinnerCard({ rank, r, projectById, teamById }: any) {
 function PodiumCol({ rank, height, r, projectById, teamById }: any) {
   const p = projectById.get(r.project_id);
   const t = p ? teamById.get(p.team_id) : null;
-  const bg = rank === 1 ? "#ffcc00" : rank === 2 ? "#e2e8f0" : "#cd7f32";
-  const fg = rank === 1 ? "#146c36" : "#146c36";
+  const bg = rank === 1 ? "var(--gradient-hero)" : rank === 2 ? "var(--gradient-cool)" : "linear-gradient(135deg, #cd7f32, #e8a566)";
   return (
     <motion.div
       className="w-40 text-center"
@@ -175,14 +165,14 @@ function PodiumCol({ rank, height, r, projectById, teamById }: any) {
       transition={{ delay: rank === 1 ? 0.3 : rank === 2 ? 0.1 : 0.5 }}
     >
       <div className="mb-3">
-        {rank === 1 && <Trophy className="h-8 w-8 mx-auto text-yellow-300 mb-1 drop-shadow" />}
-        <div className="font-bold text-base line-clamp-2 px-1 text-white">{t?.name}</div>
+        {rank === 1 && <Trophy className="h-8 w-8 mx-auto text-primary mb-1" />}
+        <div className="font-bold text-base line-clamp-2 px-1">{t?.name}</div>
       </div>
       <div
-        className={`${height} rounded-t-lg flex items-start justify-center pt-3 border-x border-t border-white/40`}
+        className={`${height} rounded-t-lg flex items-start justify-center pt-3 gradient-border`}
         style={{ background: bg }}
       >
-        <span className="text-4xl font-black drop-shadow" style={{ color: fg }}>{rank}</span>
+        <span className="text-4xl font-black text-white drop-shadow">{rank}</span>
       </div>
     </motion.div>
   );
