@@ -2,7 +2,6 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { useSession, isAdmin } from "@/lib/use-session";
 import { Trophy, Users, Zap, Shield } from "lucide-react";
 
 const GOOGLE_COLORS = ["#4285F4", "#EA4335", "#FBBC05", "#34A853"];
@@ -203,21 +202,322 @@ function StadiumTransition({ onDone }: { onDone: () => void }) {
   );
 }
 
+function playCameraFlashes(count: number, spread: number) {
+  try {
+    const Ctx = window.AudioContext || (window as any).webkitAudioContext;
+    const ctx = new Ctx();
+    for (let i = 0; i < count; i++) {
+      const t0 = ctx.currentTime + (Math.random() * spread);
+      const noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 0.03, ctx.sampleRate);
+      const data = noiseBuf.getChannelData(0);
+      for (let j = 0; j < data.length; j++) data[j] = (Math.random() * 2 - 1) * (1 - j / data.length);
+      const noise = ctx.createBufferSource();
+      noise.buffer = noiseBuf;
+      const filter = ctx.createBiquadFilter();
+      filter.type = "highpass";
+      filter.frequency.value = 4000;
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.18, t0);
+      gain.gain.linearRampToValueAtTime(0, t0 + 0.03);
+      noise.connect(filter);
+      filter.connect(gain);
+      gain.connect(ctx.destination);
+      noise.start(t0);
+    }
+    setTimeout(() => ctx.close(), (spread + 0.2) * 1000);
+  } catch {
+    // audio not available — silently skip
+  }
+}
+
+function playStamp() {
+  try {
+    const Ctx = window.AudioContext || (window as any).webkitAudioContext;
+    const ctx = new Ctx();
+    const t0 = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(160, t0);
+    osc.frequency.exponentialRampToValueAtTime(45, t0 + 0.18);
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.5, t0);
+    gain.gain.exponentialRampToValueAtTime(0.001, t0 + 0.22);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(t0);
+    osc.stop(t0 + 0.25);
+    setTimeout(() => ctx.close(), 400);
+  } catch {
+    // audio not available — silently skip
+  }
+}
+
+function playCoinFlip() {
+  try {
+    const Ctx = window.AudioContext || (window as any).webkitAudioContext;
+    const ctx = new Ctx();
+    const t0 = ctx.currentTime;
+    for (let i = 0; i < 7; i++) {
+      const t = t0 + i * 0.09 + (i * i) * 0.01;
+      const osc = ctx.createOscillator();
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(1600 - i * 60, t);
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.12, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.08);
+    }
+    const t1 = t0 + 0.85;
+    const ding = ctx.createOscillator();
+    ding.type = "sine";
+    ding.frequency.setValueAtTime(1200, t1);
+    const dingGain = ctx.createGain();
+    dingGain.gain.setValueAtTime(0.25, t1);
+    dingGain.gain.exponentialRampToValueAtTime(0.001, t1 + 0.4);
+    ding.connect(dingGain);
+    dingGain.connect(ctx.destination);
+    ding.start(t1);
+    ding.stop(t1 + 0.4);
+    setTimeout(() => ctx.close(), 1400);
+  } catch {
+    // audio not available — silently skip
+  }
+}
+
+function TunnelTransition({ onDone }: { onDone: () => void }) {
+  useEffect(() => {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) { onDone(); return; }
+    playCameraFlashes(9, 1.0);
+    const t = setTimeout(onDone, TRANSITION_MS + 300);
+    return () => clearTimeout(t);
+  }, [onDone]);
+
+  const flashes = Array.from({ length: 9 }, (_, i) => ({
+    left: `${10 + Math.random() * 80}%`,
+    top: `${10 + Math.random() * 60}%`,
+    delay: Math.random() * 1.0,
+  }));
+
+  return (
+    <motion.div
+      role="button"
+      aria-label="Skip"
+      onClick={onDone}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.25 }}
+      className="fixed inset-0 z-50 flex items-center justify-center cursor-pointer overflow-hidden bg-black"
+    >
+      {/* converging tunnel walls */}
+      <div className="absolute inset-0" style={{ perspective: 400 }}>
+        {[0, 1, 2, 3].map((i) => (
+          <motion.div
+            key={i}
+            className="absolute inset-0"
+            style={{
+              background: `linear-gradient(180deg, transparent, rgba(255,255,255,0.04) 50%, transparent)`,
+              clipPath: `polygon(${8 + i * 6}% 0%, ${92 - i * 6}% 0%, ${78 - i * 4}% 100%, ${22 + i * 4}% 100%)`,
+              border: "1px solid rgba(255,255,255,0.08)",
+            }}
+            initial={{ scale: 0.6, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.6, delay: i * 0.08 }}
+          />
+        ))}
+      </div>
+
+      {/* camera flashes */}
+      {flashes.map((f, i) => (
+        <motion.div
+          key={i}
+          className="absolute h-3 w-3 rounded-full bg-white"
+          style={{ left: f.left, top: f.top, boxShadow: "0 0 40px 20px rgba(255,255,255,0.9)" }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0, 1, 0] }}
+          transition={{ duration: 0.18, delay: f.delay }}
+        />
+      ))}
+
+      {/* spotlight sweep */}
+      <motion.div
+        className="absolute inset-0"
+        style={{ background: "radial-gradient(ellipse 40% 60% at 50% 50%, rgba(66,133,244,0.25), transparent 70%)" }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: [0, 1, 1] }}
+        transition={{ duration: 0.8 }}
+      />
+
+      {/* player walking out, growing as it approaches */}
+      <motion.div
+        className="absolute rounded-full bg-white"
+        style={{ width: 20, height: 46, bottom: "20%" }}
+        initial={{ scale: 0.4, opacity: 0 }}
+        animate={{ scale: [0.4, 1.6], opacity: [0, 1, 1] }}
+        transition={{ duration: TRANSITION_MS / 1000, ease: "easeIn" }}
+      />
+
+      <motion.p
+        className="absolute top-[16%] text-white font-black tracking-wide text-center px-6"
+        style={{ fontSize: "clamp(22px, 4.5vw, 40px)" }}
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: [0, 1, 1, 0], y: 0 }}
+        transition={{ duration: TRANSITION_MS / 1000 + 0.3, times: [0, 0.2, 0.75, 1] }}
+      >
+        WALKING OUT
+      </motion.p>
+
+      <span className="absolute bottom-6 text-xs text-white/50">Tap to skip</span>
+    </motion.div>
+  );
+}
+
+function VarReviewTransition({ onDone }: { onDone: () => void }) {
+  useEffect(() => {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) { onDone(); return; }
+    const stampT = setTimeout(playStamp, 950);
+    const t = setTimeout(onDone, TRANSITION_MS + 500);
+    return () => { clearTimeout(t); clearTimeout(stampT); };
+  }, [onDone]);
+
+  return (
+    <motion.div
+      role="button"
+      aria-label="Skip"
+      onClick={onDone}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.25 }}
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center cursor-pointer overflow-hidden bg-black"
+    >
+      <motion.div
+        className="rounded-lg border-2 border-white px-4 py-1.5 text-white font-black tracking-[0.2em] text-sm mb-8"
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        VAR
+      </motion.div>
+
+      {/* scanning line sweep */}
+      <div className="relative w-[70vw] max-w-md h-24 border border-white/30 rounded-xl overflow-hidden mb-8">
+        <motion.div
+          className="absolute inset-x-0 h-1"
+          style={{ background: "linear-gradient(90deg, transparent, #34A853, transparent)" }}
+          initial={{ top: "0%" }}
+          animate={{ top: ["0%", "100%", "0%"] }}
+          transition={{ duration: 0.9, repeat: 1, ease: "linear" }}
+        />
+      </div>
+
+      <motion.p
+        className="text-white/80 font-semibold tracking-widest text-sm mb-6"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: [0, 1, 1, 0] }}
+        transition={{ duration: 0.95, times: [0, 0.2, 0.8, 1] }}
+      >
+        CHECKING ENTRY...
+      </motion.p>
+
+      <motion.div
+        className="absolute flex items-center gap-2 rounded-xl border-4 px-6 py-3"
+        style={{ borderColor: "#34A853", color: "#34A853" }}
+        initial={{ opacity: 0, scale: 2, rotate: -8 }}
+        animate={{ opacity: [0, 0, 1], scale: [2, 2, 1], rotate: [-8, -8, -6] }}
+        transition={{ duration: 1.1, times: [0, 0.82, 1], ease: "easeOut" }}
+      >
+        <span className="text-3xl font-black tracking-wider">CONFIRMED ✓</span>
+      </motion.div>
+
+      <span className="absolute bottom-6 text-xs text-white/50">Tap to skip</span>
+    </motion.div>
+  );
+}
+
+function CoinTossTransition({ onDone }: { onDone: () => void }) {
+  useEffect(() => {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) { onDone(); return; }
+    playCoinFlip();
+    const t = setTimeout(onDone, TRANSITION_MS + 300);
+    return () => clearTimeout(t);
+  }, [onDone]);
+
+  return (
+    <motion.div
+      role="button"
+      aria-label="Skip"
+      onClick={onDone}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.25 }}
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center cursor-pointer overflow-hidden"
+      style={{ background: "var(--gradient-stage, #0d1b3d)" }}
+    >
+      <motion.div
+        className="relative grid place-items-center rounded-full font-black text-4xl"
+        style={{
+          width: 120, height: 120,
+          background: "linear-gradient(135deg, #FBBC05, #EA4335)",
+          boxShadow: "0 0 60px rgba(251,188,5,0.5)",
+          color: "#fff",
+        }}
+        initial={{ y: -40, rotateX: 0, scale: 0.8 }}
+        animate={{
+          y: [-40, -160, 0],
+          rotateX: [0, 1080, 1440],
+          scale: [0.8, 0.8, 1],
+        }}
+        transition={{ duration: 0.9, times: [0, 0.55, 1], ease: [0.33, 1, 0.68, 1] }}
+      >
+        ⚽
+      </motion.div>
+
+      <motion.p
+        className="mt-10 text-white font-black tracking-wide text-center px-6"
+        style={{ fontSize: "clamp(22px, 4.5vw, 40px)" }}
+        initial={{ opacity: 0, scale: 0.85 }}
+        animate={{ opacity: [0, 0, 1], scale: [0.85, 0.85, 1] }}
+        transition={{ duration: 1.1, times: [0, 0.8, 1] }}
+      >
+        KICKOFF!
+      </motion.p>
+
+      <span className="absolute bottom-6 text-xs text-white/50">Tap to skip</span>
+    </motion.div>
+  );
+}
+
+const TRANSITIONS = {
+  goal: StadiumTransition,
+  tunnel: TunnelTransition,
+  var: VarReviewTransition,
+  coin: CoinTossTransition,
+} as const;
+type TransitionVariant = keyof typeof TRANSITIONS;
+
 export const Route = createFileRoute("/")({
+  validateSearch: (search: Record<string, unknown>): { transition?: TransitionVariant } => ({
+    transition: (["goal", "tunnel", "var", "coin"] as const).includes(search.transition as TransitionVariant)
+      ? (search.transition as TransitionVariant)
+      : undefined,
+  }),
   component: Landing,
 });
 
 function Landing() {
-  const { session, roles, loading } = useSession();
   const navigate = useNavigate();
+  const { transition } = Route.useSearch();
   const [entering, setEntering] = useState(false);
   const navigatedRef = useRef(false);
-
-  useEffect(() => {
-    if (loading || !session) return;
-    if (isAdmin(roles)) navigate({ to: "/admin" });
-    else navigate({ to: "/vote" });
-  }, [session, roles, loading, navigate]);
+  const TransitionComponent = TRANSITIONS[transition ?? "goal"];
 
   function goToStadium() {
     if (navigatedRef.current) return;
@@ -228,7 +528,7 @@ function Landing() {
   return (
     <div className="min-h-screen">
       <AnimatePresence>
-        {entering && <StadiumTransition onDone={goToStadium} />}
+        {entering && <TransitionComponent onDone={goToStadium} />}
       </AnimatePresence>
       <nav className="container mx-auto px-6 py-6 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2 text-xl font-black">
