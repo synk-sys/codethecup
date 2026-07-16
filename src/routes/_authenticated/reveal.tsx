@@ -13,7 +13,7 @@ export const Route = createFileRoute("/_authenticated/reveal")({
   component: RevealPage,
 });
 
-type Stage = "title" | "countdown" | "third" | "second" | "first" | "podium";
+type Stage = "title" | "countdown" | "second" | "first" | "podium";
 
 function RevealPage() {
   const navigate = useNavigate();
@@ -44,7 +44,7 @@ function RevealPage() {
   const [stage, setStage] = useState<Stage>("title");
   const [count, setCount] = useState(5);
 
-  const stages: Stage[] = ["title", "countdown", "third", "second", "first", "podium"];
+  const stages: Stage[] = ["title", "countdown", "second", "first", "podium"];
   function next() {
     const idx = stages.indexOf(stage);
     if (idx < stages.length - 1) setStage(stages[idx + 1]);
@@ -104,16 +104,15 @@ function RevealPage() {
             </motion.div>
           </motion.div>
         )}
-        {stage === "third" && third && <WinnerCard rank={3} r={third} projectById={projectById} teamById={teamById} />}
         {stage === "second" && second && <WinnerCard rank={2} r={second} projectById={projectById} teamById={teamById} />}
         {stage === "first" && first && <WinnerCard rank={1} r={first} projectById={projectById} teamById={teamById} />}
         {stage === "podium" && (
           <motion.div key="podium" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="text-center">
-            <h2 className="text-5xl font-black mb-8 gradient-text">Winners</h2>
-            <div className="flex items-end justify-center gap-6">
-              {second && <PodiumCol rank={2} height="h-40" r={second} projectById={projectById} teamById={teamById} />}
-              {first && <PodiumCol rank={1} height="h-56" r={first} projectById={projectById} teamById={teamById} />}
-              {third && <PodiumCol rank={3} height="h-28" r={third} projectById={projectById} teamById={teamById} />}
+            <h2 className="text-5xl font-black mb-10 gradient-text">Winners</h2>
+            <div className="flex items-end justify-center">
+              {second && <PodiumCol rank={2} height="h-36" r={second} projectById={projectById} teamById={teamById} />}
+              {first && <PodiumCol rank={1} height="h-52" r={first} projectById={projectById} teamById={teamById} />}
+              {third && <PodiumCol rank={3} height="h-24" r={third} projectById={projectById} teamById={teamById} />}
             </div>
           </motion.div>
         )}
@@ -122,7 +121,7 @@ function RevealPage() {
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
         <Button variant="secondary" onClick={prev} disabled={stage === "title"}>Back</Button>
         <Button onClick={next} disabled={stage === "podium"} className="shadow-[var(--shadow-glow)]">
-          {stage === "title" ? "Start countdown" : stage === "countdown" ? "Reveal 3rd" : stage === "third" ? "Reveal 2nd" : stage === "second" ? "Reveal 1st" : "Show podium"}
+          {stage === "title" ? "Start countdown" : stage === "countdown" ? "Reveal 2nd" : stage === "second" ? "Reveal 1st" : "Show podium"}
         </Button>
       </div>
     </div>
@@ -144,13 +143,24 @@ function WinnerCard({ rank, r, projectById, teamById }: any) {
 function PodiumCol({ rank, height, r, projectById, teamById }: any) {
   const p = projectById.get(r.project_id);
   const t = p ? teamById.get(p.team_id) : null;
+  const bg = rank === 1 ? "var(--gradient-hero)" : rank === 2 ? "var(--gradient-cool)" : "var(--gradient-warm, var(--gradient-cool))";
   return (
-    <div className="w-64 text-center">
+    <motion.div
+      className="w-40 text-center"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: rank === 1 ? 0.3 : rank === 2 ? 0.1 : 0.5 }}
+    >
       <div className="mb-3">
-        <div className="text-xs uppercase tracking-widest text-muted-foreground">{rank === 1 ? "1st" : rank === 2 ? "2nd" : "3rd"}</div>
-        <div className="font-bold text-lg line-clamp-2">{t?.name}</div>
+        {rank === 1 && <Trophy className="h-8 w-8 mx-auto text-primary mb-1" />}
+        <div className="font-bold text-base line-clamp-2 px-1">{t?.name}</div>
       </div>
-      <div className={`${height} rounded-t-xl gradient-border`} style={{ background: rank === 1 ? "var(--gradient-hero)" : rank === 2 ? "var(--gradient-cool)" : "var(--gradient-warm, var(--gradient-cool))" }} />
-    </div>
+      <div
+        className={`${height} rounded-t-lg flex items-start justify-center pt-3 border-x border-t border-white/20`}
+        style={{ background: bg }}
+      >
+        <span className="text-4xl font-black text-white drop-shadow">{rank}</span>
+      </div>
+    </motion.div>
   );
 }
